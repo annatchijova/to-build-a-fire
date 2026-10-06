@@ -152,6 +152,7 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
 - `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
 - `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
+- `.gitlab/duo/flows/attention-review.yml` — first MR-mapping flow draft; the mapper is read-only and an internal-note write follows human approval. Not yet GitLab-validated or run.
 - `.gitlab-ci.yml` — current local contract test job; it is not a Duo flow or merge/deploy gate.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.

@@ -150,6 +150,7 @@ El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evide
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
 - `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
 - `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
+- `.gitlab/duo/flows/attention-review.yml` — primer flow de mapeo de MR; el mapper es de sólo lectura y una acción determinista publica la nota interna sólo tras aprobación humana. Falta validarlo y ejecutarlo en GitLab.
 - `.gitlab-ci.yml` — job actual de verificaciones locales del proyecto; todavía no es un flow Duo ni un gate de merge/deploy.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.

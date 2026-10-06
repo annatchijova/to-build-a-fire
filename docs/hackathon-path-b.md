@@ -78,7 +78,7 @@ GitLab UI flows run in CI/CD. The Flow Registry supports `require_tool_approval:
 - Orbit Remote MCP is an optional read-only structural context provider for ownership/dependency mapping. It is not the policy authority or evidence verifier. The demo must still work and explain its limitation if Orbit is unavailable.
 - Anthropic Claude is used through the GitLab Duo model/provider configuration; the project does not require a separate Anthropic credential.
 
-The exact custom-flow YAML and MCP configuration will be added only after validating them against GitLab's current Flow Registry schema and the permissions enabled on this project. References: [custom flow schema](https://docs.gitlab.com/user/duo_agent_platform/flows/custom_flows_schema/), [flow execution](https://docs.gitlab.com/user/duo_agent_platform/flows/execution/), [triggers](https://docs.gitlab.com/user/duo_agent_platform/triggers/), and [Duo MCP clients](https://docs.gitlab.com/user/gitlab_duo/model_context_protocol/mcp_clients/).
+The checked-in flow is an initial draft based on the current Flow Registry schema; it still needs GitLab-side validation and execution. Later flow/MCP configuration must be validated against the schema and the permissions enabled on this project. References: [custom flow schema](https://docs.gitlab.com/user/duo_agent_platform/flows/custom_flows_schema/), [flow execution](https://docs.gitlab.com/user/duo_agent_platform/flows/execution/), [triggers](https://docs.gitlab.com/user/duo_agent_platform/triggers/), and [Duo MCP clients](https://docs.gitlab.com/user/gitlab_duo/model_context_protocol/mcp_clients/).
 
 ## Path B submission evidence
 
@@ -92,4 +92,4 @@ The exact custom-flow YAML and MCP configuration will be added only after valida
 
 ## Current state
 
-The local deterministic router and contract exist. A project test job is configured but has not yet been observed running in GitLab; it does not trigger Duo, capture an MR, attest evidence, deploy, or monitor. No lifecycle coverage beyond local tests/router behavior is counted as implemented. The earlier illustrative CI receipt is intentionally excluded from the end-to-end evidence chain.
+The local deterministic router and contract exist. A project test job is configured but has not yet been observed running in GitLab; it does not capture MR evidence, attest evidence, deploy, or monitor. A first Duo MR-assessment flow draft exists at `.gitlab/duo/flows/attention-review.yml`: its mapper is read-only, and the internal-note write is a deterministic step after human approval. The draft has not yet passed GitLab validation, been enabled, or executed. No lifecycle coverage beyond local tests/router behavior is counted as implemented. The earlier illustrative CI receipt is intentionally excluded from the end-to-end evidence chain.
