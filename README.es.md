@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** concepto y planificación para un hackathon. Este repositorio todavía no contiene una implementación ni resultados medidos.
+> **Estado del proyecto:** existen el router local y un job para las verificaciones del proyecto; todavía no vimos ejecutarse ese pipeline en GitLab. La automatización end to end con Duo, evidencia de un MR real, aprobaciones protegidas, despliegue a Cloud Run y monitoreo son el objetivo del Nivel 1 Path B/Assisted, no funciones terminadas. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
 ## El problema
 
@@ -46,7 +46,7 @@ El router tiene tres rutas de atención explicables:
 | `TARGETED_REVIEW` | Hay claims consecuentes cuya incertidumbre persiste; el router señala claims, brechas de evidencia y ubicaciones concretas. |
 | `DEEP_REVIEW` | El impacto es amplio, contradictorio o demasiado incierto para una revisión acotada; una persona debe evaluar el cambio en profundidad. |
 
-Estados como `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED` y `NOT_RUN` describen qué establecieron las verificaciones. Son distintos de las rutas de atención. Los gates explícitos de merge o release son una decisión de política aparte. El motor local actual exige alcance declarado y verificaciones para el SHA exacto; todavía no está conectado a GitLab ni a CI en vivo.
+Estados como `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED` y `NOT_RUN` describen qué establecieron las verificaciones. Son distintos de las rutas de atención. Los gates explícitos de merge o release son una decisión de política aparte. El motor local exige alcance declarado y verificaciones para el SHA exacto. GitLab CI está configurado para ejecutar las verificaciones del proyecto, pero aún no consume evidencia de un MR real ni funciona como gate confiable de decisión.
 
 ## Una distinción útil
 
@@ -141,7 +141,7 @@ flowchart LR
     MONITOR -. regresión .-> PLAN
 ```
 
-Estas etapas describen el rumbo previsto, no integraciones terminadas. El uso de GitLab Duo Agent Platform es un requisito del hackathon y todavía falta implementarlo.
+El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evidencia observable. La [matriz Path B / Assisted](docs/hackathon-path-b.md#nine-stage-coverage-contract) define qué prueba necesita cada etapa; todavía no afirma que las integraciones estén ejecutándose.
 
 ## Mapa del repositorio
 
@@ -149,6 +149,8 @@ Estas etapas describen el rumbo previsto, no integraciones terminadas. El uso de
 - `README.es.md` — versión en español de la descripción.
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
 - `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
+- `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
+- `.gitlab-ci.yml` — job actual de verificaciones locales del proyecto; todavía no es un flow Duo ni un gate de merge/deploy.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.
 - `docs/red-team/` — revisiones adversariales de diseño y su evidencia.
@@ -160,18 +162,18 @@ El producto se plantea como niveles completos y conectados. Cada nivel sirve por
 
 ```mermaid
 flowchart LR
-    L1[1 · Un MR, un repositorio<br/>Enrutar atención por evidencia y capacidad]
+    L1[1 · Un cambio, end to end<br/>Las nueve etapas con gates humanos]
     L2[2 · Scheduler de atención humana<br/>Asignar capacidad entre MRs]
-    L3[3 · Ciclo gobernado<br/>Reparar hasta monitorear]
+    L3[3 · Reparación aprobada<br/>Reevaluar, liberar, monitorear]
     L4[4 · Cartera de repositorios<br/>Contratos entre proyectos y aprendizaje]
     L1 --> L2 --> L3 --> L4
 ```
 
 | Nivel | Estado completo y útil |
 | --- | --- |
-| **1. Attention Router para un MR** | Enrutar el trabajo humano de un MR real según evidencia, incertidumbre consecuente, minutos estimados y capacidad disponible. |
+| **1. Un cambio, end to end** | Recorrer las nueve etapas post-code con un MR real de GitLab, GitLab Duo, evidencia acotada, checkpoints humanos, release protegido, despliegue en Cloud Run y monitoreo. |
 | **2. Scheduler de atención humana del equipo** | Asignar el presupuesto de revisión entre MRs, mostrar el corte de capacidad y el trabajo consecuente que sigue sin revisar. |
-| **3. Ciclo de cambio gobernado** | El sistema puede proponer reparaciones acotadas, verificarlas, armar evidencia, aplicar gates explícitos de release, trasladar políticas a la configuración y observar señales posteriores al despliegue. Las aprobaciones humanas y acciones permitidas a agentes son explícitas; las regresiones reabren el ciclo de evidencia y revisión. |
+| **3. Reparación aprobada y reevaluación** | Una reparación acotada crea una revisión separada con evidencia nueva, gates de release/deploy y monitoreo enlazados a la decisión original. |
 | **4. Cartera de repositorios** | Los equipos pueden aplicar políticas compatibles a repositorios relacionados, contemplar contratos y dependencias entre proyectos, y comparar esfuerzo y resultados medidos de revisión. Cualquier ajuste sigue siendo explicable y no puede debilitar en silencio la evidencia o política requerida. |
 
 El destino completo es un sistema de atención que contempla una cartera de repositorios, sigue el cambio desde su propuesta hasta la evidencia posterior al despliegue, dirige el juicio humano a claims consecuentes aún sin resolver y registra por qué cada acción fue permitida, enrutada o detenida. El plazo del hackathon modifica cuántos niveles se intentan; no cambia el criterio de finalización ni vuelve descartable un nivel incompleto. El [README técnico](TECHNICAL_README.md#destination-and-build-levels) detalla los límites de cada nivel, la evidencia de finalización y los invariantes que se heredan desde el primero.

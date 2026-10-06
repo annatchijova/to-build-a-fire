@@ -62,27 +62,15 @@ Estos requisitos acompañan cada nivel desde el primero que procesa un MR:
 
 Los cambios de nivel reciben revisión adversarial propia y comprueban que los invariantes anteriores siguen vigentes. Al terminar el horizonte elegido se hace revisión integrada de todos los niveles y después la verificación integrada.
 
-## Nivel 1 — Attention Router para un MR
+## Nivel 1 — Un cambio, end to end
 
-**Estado completo:** un equipo puede usar el Attention Router con un merge request real en un repositorio. El sistema presenta el trabajo humano pendiente, su motivo, los claims/cambios y ubicaciones que lo originan, la capacidad disponible y lo que queda fuera de esa capacidad. El contrato interno contiene mapa del cambio, claims candidatos/afectados, evidencia encontrada/ausente, tareas y provenance. Se integra con GitLab Duo Agent Platform para investigación/falsificación y con CI/verificaciones deterministas para evidencia ejecutable.
+**Estado completo:** un MR real en un repo de GitLab recorre un ciclo asistido del post-code lifecycle y llega a una versión desplegada y monitoreada. La demo integra las nueve etapas: **Plan, Create, Verify, Package, Secure, Release, Configure, Monitor y Govern**. El equipo ve atención pendiente, motivos, claims/ubicaciones, evidencia y límites, capacidad humana, gates y provenance. La matriz operativa, criterios de evidencia y permisos están en [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
-**Incluye:**
+El marco es Path B (proyecto original con licencia MIT) y autonomía Assisted. Duo mapea el cambio y propone; CI comprueba; policy enruta; una persona aprueba cada transición consecuente. El merge y el despliegue conservan gates explícitos. GCP Cloud Run es el destino elegido por la autora para demostrar el bonus de Google Cloud; OIDC evita claves cloud persistentes.
 
-- Entrada de GitLab para un MR con captura inmutable de base, head y metadatos necesarios; configura capacidad humana disponible para la ventana de revisión.
-- Mapa del cambio por archivo/hunk, dependencias e interfaces afectadas; los clasificadores automáticos declaran incertidumbre y enlazan al diff.
-- Un contrato versionado interno de `Review Package` con observaciones tipadas, claims, verificaciones, tareas de atención y procedencia.
-- Política explícita del repo para superficies protegidas, evidencia requerida, rutas y estimaciones humanas declaradas. Claims de ejemplo: límite de autorización y compatibilidad de contrato.
-- Agentes Duo de análisis/falsificación con permisos de sólo lectura. Los agentes pueden sugerir checks y claims, no certificar el resultado.
-- Ejecución de verificaciones seleccionadas y registro de revisión, comando/herramienta, versión, resultado, alcance, limitaciones y artefactos.
-- Evaluador determinista que aplica policy versionada a evidencia estructurada; el router asigna ruta, demanda de atención y motivo por separado.
-- Rutas de atención `COVERED_BY_EVIDENCE`, `TARGETED_REVIEW` y `DEEP_REVIEW`, con minutos y origen de la estimación; si no puede respaldarse una estimación, informa `UNKNOWN`.
-- Comparación de demanda de ese MR con capacidad humana declarada para la ventana; la UI distingue tareas cubiertas, pendientes y demanda desconocida.
-- Salida legible del Attention Router enlazada al paquete: comentario o vista de MR y comando local para inspeccionar/reproducir la decisión.
-- Retención acotada y controlada de datos; nunca enviar secretos ni contexto privado no necesario a modelos externos.
+**Criterio de cierre:** el MR real activa un GitLab Duo Agent Platform flow visible en la historia CI/sesiones; se ven checkpoints humanos y aprobaciones protegidas; pruebas y scanners están vinculados al SHA evaluado; el Review Package puede reconstruirse; el release/deploy usa ese SHA y deja evidencia; Cloud Run responde en una URL pública; health/monitoring vincula una regresión con el cambio y reabre atención. La prueba compara cambios contrastantes y controles benignos. Ninguna etapa cuenta por estar sólo en un diagrama o prompt. No se afirma reducción de esfuerzo sin línea base ni se afirma “seguro” por líneas resumidas.
 
-**Criterio de cierre:** una demo conectada a GitLab muestra diffs contrastantes —uno grande dominado por cambios generados/mecánicos y uno pequeño que cruza autorización— junto con controles benignos. El router indica por qué y dónde hace falta atención, la demanda en minutos y qué queda sin cubrir; cada tarea enlaza a sus candidatos, evidencia y alcance. Con evidencia ausente, contradictoria o de otro SHA no marca el claim como cubierto. Un falsifier puede proponer contraejemplos como candidatos, pero no emitir conclusiones. Una persona puede reconstruir el recibo de la decisión. No se publica reducción de esfuerzo sin línea base y medición, ni se afirma “seguro” por la cantidad de líneas resumidas.
-
-**No se considera terminado** si sólo existe una interfaz, un prompt de review, una suma de líneas, un score opaco, un comentario de agente o un demo desconectado del artefacto de decisión.
+**No se considera terminado** si sólo existe el router local, una interfaz, una pipeline genérica de tests, un comentario de agente o un demo desconectado del flujo, las aprobaciones y el despliegue reales.
 
 ## Nivel 2 — Scheduler de atención humana para el equipo
 
@@ -99,9 +87,9 @@ Los cambios de nivel reciben revisión adversarial propia y comprueban que los i
 
 **Criterio de cierre:** ante una cola con diffs grandes mecánicos y diffs pequeños consecuentes, el equipo puede ver demanda frente a capacidad en minutos, por qué se ordenaron así, quién puede revisar cada claim y qué quedó sin atender. Cambiar el orden o adjudicar un hallazgo mantiene el paquete original y deja una decisión nueva trazable.
 
-## Nivel 3 — Ciclo de cambio gobernado
+## Nivel 3 — Reparación y re-evaluación bajo aprobación humana
 
-**Estado completo:** desde el MR, el equipo puede permitir que agentes propongan reparaciones acotadas, verificarlas, empaquetar el resultado, aplicar gates de release, observar el despliegue y reabrir el flujo ante una regresión. El sistema cubre el ciclo post-código de forma operativa y mantiene gates explícitos para acciones de impacto.
+**Estado completo:** el flujo que ya cubre el ciclo de Nivel 1 también puede proponer una reparación acotada, evaluarla como un cambio nuevo, y enlazar verificación, release, despliegue, monitorización y re-apertura con la decisión original.
 
 **Incluye:**
 
@@ -113,7 +101,7 @@ Los cambios de nivel reciben revisión adversarial propia y comprueban que los i
 - Monitorización de señales previamente declaradas; una regresión crea un nuevo evento relacionado y reabre evaluación/revisión.
 - Registro de gates, approvals, errores, skips, reintentos, deploys y no-ops para reconstruir qué pasó.
 
-**Criterio de cierre:** una reparación propuesta recorre el flujo de verificación y release con aprobación humana cuando la policy la exige. Un test o scanner fallido bloquea según regla; uno no ejecutado no cuenta como limpio. Una regresión post-deploy se vincula al paquete y revisión originales y produce una tarea accionable.
+**Criterio de cierre:** una reparación propuesta nunca modifica su policy ni se autoaprueba. Cada SHA nuevo recibe sus propias verificaciones/paquete; la reparación necesita aprobación humana según policy. Un test o scanner fallido bloquea según regla; uno no ejecutado no cuenta como limpio. Una regresión post-deploy se vincula a los paquetes y revisiones originales y produce una tarea accionable.
 
 ## Nivel 4 — Atención y evidencia entre repositorios
 
@@ -139,13 +127,17 @@ Los cambios de nivel reciben revisión adversarial propia y comprueban que los i
 
 ## Orden de construcción y pendientes
 
-1. [ ] Cerrar contrato v1 del Review Package: tipos de claim, observación, evidencia, outcome, SHA y versiones de schema/policy.
-2. [ ] Especificar flujo GitLab MR y permisos mínimos disponibles para GitLab Duo Agent Platform.
-3. [ ] Acordar el repositorio de demostración y sus claims protegidos (autorización, contrato/API, configuración de seguridad).
-4. [ ] Definir verificaciones ejecutables y alcance exacto de cada una para el Nivel 1.
-5. [ ] Escribir corpus de MRs con resultados esperados: 2.000 líneas generadas benignas, bump de dependencia, refactor de formato, test faltante, widening de auth en 2 líneas, scanner eliminado, assertion debilitada, umbral de coverage reducido, CI con `|| true` y controles benignos.
-6. [ ] Definir oráculos para el corpus: cero cambios críticos sembrados que acaben en `COVERED_BY_EVIDENCE`; cero promociones de observación candidata a conclusión sin evidencia/adjudicación autorizada; informar la tasa de controles benignos escalados y minutos de review frente a línea base por separado; los casos fuera de alcance conservan esa limitación y se enrutan a revisión profunda.
-7. [ ] Construir y cerrar el Nivel 1 con su revisión adversarial y evidencia de demo.
-8. [ ] Sólo entonces fijar con evidencia el siguiente nivel que se construye y su horizonte real.
+1. [x] Cerrar el contrato local v1 del Review Package y su router. La carga confiable de policy y autenticación de artefactos siguen pendientes.
+2. [x] Definir un contrato de entrega que separa los cuatro niveles de producto de las nueve etapas del hackathon y cubre el camino Path B/Assisted end to end (`docs/hackathon-path-b.md`).
+3. [ ] Confirmar effective role/capacidades: custom flow, `agent-config.yml`, trigger de MR y checkpoints de aprobación en el proyecto GitLab.
+4. [ ] Fijar demo repo/claims protegidos, policy protegida y ownership de configuración. Usar el proyecto Showcase o acordar un proyecto GitLab de demo enlazado; el repo GitHub sigue siendo el proyecto original.
+5. [ ] Implementar y probar el Flow Registry v1 de Duo con Plan/Mapper, evidencia/Falsifier, Router, `require_tool_approval: true` (sin escrituras preaprobadas) y `HumanInputComponent` en cada transición consecuente. Mantener agentes en observación hasta el gate explícito.
+6. [ ] Extender CI por una ruta real del MR: captura del diff/SHAs, verificaciones y scanners con alcance, recibo reproducible, artefactos y gates; no tratar el CI modificado por el MR como raíz de confianza.
+7. [ ] Implementar release/configure/deploy a Cloud Run con protección GitLab, OIDC de vida corta, configuración versionada y referencia al SHA aprobado.
+8. [ ] Implementar health/monitoring y re-apertura enlazada; documentar las nueve etapas con evidencia ejecutada y una demo pública contrastante.
+9. [ ] Corpus de MRs con resultados esperados: diff generado benigno de 2.000 líneas, dependencia, formato, test faltante, widening de auth en 2 líneas, scanner eliminado, assertion debilitada, umbral reducido, CI con `|| true` y controles benignos.
+10. [ ] Cerrar Nivel 1 con revisión adversarial integrada y verificación del recorrido completo. Reportar falsos positivos y minutos contra línea base por separado; no afirmar mejora sin medirla.
+11. [ ] Preparar materiales Path B: URL de proyecto original, cambios de automatización/despliegue realizados desde 2026-10-05, URL GitLab pública, URL Cloud Run, historial de pipeline y video YouTube público de menos de tres minutos.
+12. [ ] Sólo después del cierre de Nivel 1, seleccionar horizonte y construir Nivel 2 (scheduler multi-MR), luego Nivel 3 y Nivel 4.
 
-El primer nivel que se implemente tiene que ser el Attention Router completo para un MR descrito arriba. Si el hackathon no permite terminar otro nivel, el producto alcanzado sigue siendo una herramienta útil para asignar atención a un MR a la vez.
+El primer nivel que se implemente es el recorrido Assisted end to end de un cambio: las nueve etapas con evidencia real y gates humanos. Si el hackathon no permite terminar el Nivel 2, queda como producto útil ese recorrido de un MR desde evaluación hasta deployment/monitoring; no se rebaja a una pipeline de tests presentada como integración.

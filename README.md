@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** the Level 1 local routing core is implemented. GitLab Duo integration, live MR evidence capture, connected demonstrations, corpus-level metrics, and measured outcomes are not yet available.
+> **Project status:** the local routing core and project test job are present; live GitLab execution is not yet verified. End-to-end Duo automation, real MR evidence, protected approvals, Cloud Run deployment and monitoring are the Path B/Assisted Level 1 target, not completed features. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
 ## The problem
 
@@ -46,7 +46,7 @@ The router has three explainable attention routes:
 | `TARGETED_REVIEW` | Specific consequential claims remain uncertain; the router shows the exact claims, evidence gaps, and locations to inspect. |
 | `DEEP_REVIEW` | Impact is broad, contradictory, or too uncertain for a narrow review; a person needs to assess the change more fully. |
 
-Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks; it is not yet connected to GitLab or live CI.
+Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI is configured to run the project checks, but it is not yet connected to live MR evidence or a trusted decision gate.
 
 ## A useful distinction
 
@@ -126,6 +126,8 @@ The planned evaluation uses seeded changes and benign controls: generated diffs,
 
 The planned demonstration contrasts a large, mostly generated change with a tiny authorization change, then shows the attention demand against team capacity. It should show how evidence and protected claims affect routing, rather than claim that the system has already reduced review time.
 
+The target demo maps one connected MR flow across all nine post-code lifecycle stages. The coverage table and evidence required for each are in the [Path B / Assisted build contract](docs/hackathon-path-b.md#nine-stage-coverage-contract). This is a target, not a claim that the integrations already run.
+
 The concept maps to the post-code lifecycle the GitLab Transcend hackathon asks participants to explore:
 
 ```mermaid
@@ -149,6 +151,8 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `README.es.md` — Spanish version of the overview.
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
 - `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
+- `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
+- `.gitlab-ci.yml` — current local contract test job; it is not a Duo flow or merge/deploy gate.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.
 - `docs/red-team/` — adversarial design reviews and their evidence.
@@ -160,18 +164,18 @@ The product is planned as a set of complete, connected levels. Each level is use
 
 ```mermaid
 flowchart LR
-    L1[1 · One MR, one repository<br/>Route attention by evidence and capacity]
+    L1[1 · One change, end to end<br/>All nine stages with human gates]
     L2[2 · Team attention scheduler<br/>Allocate capacity across MRs]
-    L3[3 · Governed lifecycle<br/>Repair through monitor]
+    L3[3 · Approved repair<br/>Re-evaluate, release, monitor]
     L4[4 · Repository portfolio<br/>Cross-project contracts and learning]
     L1 --> L2 --> L3 --> L4
 ```
 
 | Level | Complete, useful state |
 | --- | --- |
-| **1. Single-MR Attention Router** | Route a real MR's human work by evidence, consequential uncertainty, estimated minutes, and available capacity. |
+| **1. One change, end to end** | Run one real GitLab MR across all nine post-code stages, with GitLab Duo, evidence-bound routing, human checkpoints, protected release, Cloud Run deployment, and monitoring. |
 | **2. Team attention scheduler** | Allocate a shared review budget across MRs, expose the cutoff, and show consequential work still unreviewed. |
-| **3. Governed change lifecycle** | The system can propose bounded repairs, verify them, package evidence, apply explicit release gates, carry policy into configuration, and watch post-deploy signals. Human approvals and permitted agent actions are explicit; regressions reopen the evidence and review loop. |
+| **3. Approved repair and re-evaluation** | A bounded repair becomes a separately reviewed revision with fresh evidence, release/deploy gates, and monitoring linked to the original decision. |
 | **4. Repository portfolio** | Teams can apply compatible policies across related repositories, account for cross-project contracts and dependencies, and compare measured review effort and outcomes. Any tuning remains explainable and cannot silently weaken required evidence or policy. |
 
 The complete destination is a portfolio-aware attention system that follows a change from proposal through post-deploy evidence, directs human judgment to unresolved consequential claims, and records why each action was allowed, routed, or stopped. A hackathon deadline changes how many levels we attempt; it does not change the completion bar or make an unfinished level disposable. See the [Technical README](TECHNICAL_README.md#destination-and-build-levels) for level boundaries, completion evidence, and invariants inherited from the first level.
