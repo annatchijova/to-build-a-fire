@@ -197,10 +197,12 @@ def build_artifact(input_data: dict[str, Any]) -> dict[str, Any]:
     else:
         schedule_state = "WITHIN_CAPACITY"
 
+    policy_record = dict(input_data["policy"])
+    policy_record["sha256"] = hashlib.sha256(_canonical_bytes(input_data["policy"])).hexdigest()
     artifact = {
         "schema_version": "tbaf.review-package/v1",
         "change": input_data["change"],
-        "policy": {"id": input_data["policy"]["id"], "version": input_data["policy"]["version"]},
+        "policy": policy_record,
         "observations": input_data["observations"],
         "checks": input_data["checks"],
         "claims": claim_results,

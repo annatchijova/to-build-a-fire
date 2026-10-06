@@ -94,54 +94,36 @@ def _identity(value: Any, where: str) -> str:
     return text
 
 
-def parse_input(data: bytes | str) -> dict[str, Any]:
-    """Parse and normalize one bounded v1 review input."""
+def _decode_json(data: bytes | str, where: str) -> Any:
     if isinstance(data, bytes):
         if len(data) > MAX_INPUT_BYTES:
-            raise ContractError("input exceeds the 2 MB limit")
+            raise ContractError(f"{where} exceeds the 2 MB limit")
         try:
             source = data.decode("utf-8", errors="strict")
         except UnicodeDecodeError as exc:
-            raise ContractError("input must be UTF-8") from exc
+            raise ContractError(f"{where} must be UTF-8") from exc
     elif isinstance(data, str):
         if len(data.encode("utf-8")) > MAX_INPUT_BYTES:
-            raise ContractError("input exceeds the 2 MB limit")
+            raise ContractError(f"{where} exceeds the 2 MB limit")
         source = data
     else:
-        raise ContractError("input must be UTF-8 JSON bytes or text")
+        raise ContractError(f"{where} must be UTF-8 JSON bytes or text")
 
     try:
-        raw = json.loads(source, object_pairs_hook=_object, parse_constant=lambda v: (_ for _ in ()).throw(ContractError(f"invalid number: {v}")))
+        return json.loads(source, object_pairs_hook=_object, parse_constant=lambda v: (_ for _ in ()).throw(ContractError(f"invalid number: {v}")))
     except ContractError:
         raise
     except (json.JSONDecodeError, RecursionError) as exc:
-        raise ContractError("input is not valid bounded JSON") from exc
+        raise ContractError(f"{where} is not valid bounded JSON") from exc
 
-    top = _keys(raw, {"schema_version", "change", "policy", "observations", "checks"},
-                {"schema_version", "change", "policy", "observations", "checks"}, "input")
-    if top["schema_version"] != INPUT_SCHEMA:
-        raise ContractError(f"schema_version must be {INPUT_SCHEMA}")
 
-    change = _keys(top["change"], {"project", "mr_iid", "base_sha", "head_sha", "paths"},
-                   {"project", "mr_iid", "base_sha", "head_sha", "paths"}, "change")
-    project = _text(change["project"], "change.project", limit=255)
-    if not _PROJECT_RE.fullmatch(project):
-        raise ContractError("change.project must be a namespace/project path")
-    mr_iid = _integer(change["mr_iid"], "change.mr_iid", minimum=1)
-    base_sha = _text(change["base_sha"], "change.base_sha", limit=64)
-    head_sha = _text(change["head_sha"], "change.head_sha", limit=64)
-    if not _SHA_RE.fullmatch(base_sha) or not _SHA_RE.fullmatch(head_sha):
-        raise ContractError("base_sha and head_sha must be lowercase 40- or 64-character Git object IDs")
-    if base_sha == head_sha:
-        raise ContractError("base_sha and head_sha must identify different revisions")
-    paths = _paths(change["paths"], "change.paths")
-    if not paths:
-        raise ContractError("change.paths must contain at least one changed path")
-    if len(set(paths)) != len(paths):
-        raise ContractError("change.paths contains duplicates")
-
-    policy = _keys(top["policy"], {"id", "version", "capacity_minutes", "claims"},
-                   {"id", "version", "capacity_minutes", "claims"}, "policy")
+def parse_policy(data: bytes | str) -> dict[str, Any]:
+    """Parse the separately supplied repository policy v1 document."""
+    raw = _decode_json(data, "policy")
+    policy = _keys(raw, {"schema_version", "id", "version", "capacity_minutes", "claims"},
+                   {"schema_version", "id", "version", "capacity_minutes", "claims"}, "policy")
+    if policy["schema_version"] != "tbaf.policy/v1":
+        raise ContractError("policy.schema_version must be tbaf.policy/v1")
     policy_id = _identity(policy["id"], "policy.id")
     policy_version = _text(policy["version"], "policy.version", limit=128)
     capacity = policy["capacity_minutes"]
@@ -188,6 +170,40 @@ def parse_input(data: bytes | str) -> dict[str, Any]:
             "attention_minutes": minutes,
             "estimate_source": estimate_source,
         })
+    if not claims:
+        raise ContractError("policy.claims must contain at least one declared protected claim")
+    return {"id": policy_id, "version": policy_version, "capacity_minutes": capacity, "claims": claims}
+
+
+def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
+    """Parse one untrusted MR record under a separately supplied policy."""
+    raw = _decode_json(data, "input")
+
+    top = _keys(raw, {"schema_version", "change", "observations", "checks"},
+                {"schema_version", "change", "observations", "checks"}, "input")
+    if top["schema_version"] != INPUT_SCHEMA:
+        raise ContractError(f"schema_version must be {INPUT_SCHEMA}")
+
+    change = _keys(top["change"], {"project", "mr_iid", "base_sha", "head_sha", "paths"},
+                   {"project", "mr_iid", "base_sha", "head_sha", "paths"}, "change")
+    project = _text(change["project"], "change.project", limit=255)
+    if not _PROJECT_RE.fullmatch(project):
+        raise ContractError("change.project must be a namespace/project path")
+    mr_iid = _integer(change["mr_iid"], "change.mr_iid", minimum=1)
+    base_sha = _text(change["base_sha"], "change.base_sha", limit=64)
+    head_sha = _text(change["head_sha"], "change.head_sha", limit=64)
+    if not _SHA_RE.fullmatch(base_sha) or not _SHA_RE.fullmatch(head_sha):
+        raise ContractError("base_sha and head_sha must be lowercase 40- or 64-character Git object IDs")
+    if base_sha == head_sha:
+        raise ContractError("base_sha and head_sha must identify different revisions")
+    paths = _paths(change["paths"], "change.paths")
+    if not paths:
+        raise ContractError("change.paths must contain at least one changed path")
+    if len(set(paths)) != len(paths):
+        raise ContractError("change.paths contains duplicates")
+
+    policy = parse_policy(policy_data)
+    claims = policy["claims"]
 
     observations: list[dict[str, Any]] = []
     seen_observations: set[str] = set()
@@ -234,9 +250,6 @@ def parse_input(data: bytes | str) -> dict[str, Any]:
             "locations": locations,
             "epistemic_status": "CANDIDATE",
         })
-
-    if not claims:
-        raise ContractError("policy.claims must contain at least one declared protected claim")
 
     changed_paths = set(paths)
     for observation in observations:
@@ -286,7 +299,7 @@ def parse_input(data: bytes | str) -> dict[str, Any]:
     return {
         "schema_version": INPUT_SCHEMA,
         "change": {"project": project, "mr_iid": mr_iid, "base_sha": base_sha, "head_sha": head_sha, "paths": paths},
-        "policy": {"id": policy_id, "version": policy_version, "capacity_minutes": capacity, "claims": claims},
+        "policy": policy,
         "observations": observations,
         "checks": checks,
     }

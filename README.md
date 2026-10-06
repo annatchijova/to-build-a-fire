@@ -180,11 +180,11 @@ The implementation language is Python. The project is licensed under the MIT Lic
 
 ### Local router core
 
-The CLI accepts a bounded `tbaf.review-input/v1` JSON record and emits a deterministic, SHA-256-addressed internal receipt. Changed files outside declared claim scope and stale candidates route to deep review. Candidate observations cannot clear policy-mapped claims; required checks must be reported as passing on the exact head revision before declared scope can be marked covered. Unknown effort stays unknown. The current CLI does not authenticate the check producer or artifact reference, so this route is only as trustworthy as the caller-provided input.
+The CLI accepts an untrusted, bounded `tbaf.review-input/v1` JSON record and a separately supplied `tbaf.policy/v1` file, then emits a deterministic, SHA-256-addressed internal receipt. Changed files outside declared claim scope and stale candidates route to deep review. Candidate observations cannot clear policy-mapped claims; required checks must be reported as passing on the exact head revision before declared scope can be marked covered. Unknown effort stays unknown. The policy must come from a trusted, protected location; the current CLI does not authenticate check producers or artifact references, so its receipt only evaluates supplied records.
 
 ```bash
 python -m pip install -e .
-tbaf-route examples/review-input.json
+tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
 This local contract is an early single-MR core, not a GitLab integration, merge gate, safety verdict, or measured reviewer-time reduction.

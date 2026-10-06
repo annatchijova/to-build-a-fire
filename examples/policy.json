@@ -1,0 +1,18 @@
+{
+  "schema_version": "tbaf.policy/v1",
+  "id": "service-review",
+  "version": "1",
+  "capacity_minutes": 90,
+  "claims": [
+    {
+      "id": "authorization-boundary",
+      "statement": "Authorization checks remain enforced.",
+      "consequence": "critical",
+      "path_globs": ["src/auth.py"],
+      "required_checks": ["authorization-invariants"],
+      "review_route": "targeted",
+      "attention_minutes": 35,
+      "estimate_source": "Example team estimate; replace with repository policy"
+    }
+  ]
+}

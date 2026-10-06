@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import unittest
 
@@ -14,16 +15,20 @@ BASE = "a" * 40
 HEAD = "b" * 40
 
 
-def make_input(*, path="src/auth.py", capacity=180, status="NOT_RUN", observation=None):
+def make_policy(*, capacity=180):
+    return {"schema_version": "tbaf.policy/v1", "id": "default", "version": "1",
+            "capacity_minutes": capacity,
+            "claims": [{"id": "authorization", "statement": "Authorization boundaries remain enforced.",
+                        "consequence": "critical", "path_globs": ["src/auth.py"],
+                        "required_checks": ["auth-invariants"], "review_route": "targeted",
+                        "attention_minutes": 35, "estimate_source": "team estimate v1"}]}
+
+
+def make_input(*, path="src/auth.py", status="NOT_RUN", observation=None):
     value = {
         "schema_version": "tbaf.review-input/v1",
         "change": {"project": "example/service", "mr_iid": 82, "base_sha": BASE,
                    "head_sha": HEAD, "paths": [path]},
-        "policy": {"id": "default", "version": "1", "capacity_minutes": capacity,
-                   "claims": [{"id": "authorization", "statement": "Authorization boundaries remain enforced.",
-                               "consequence": "critical", "path_globs": ["src/auth.py"],
-                               "required_checks": ["auth-invariants"], "review_route": "targeted",
-                               "attention_minutes": 35, "estimate_source": "team estimate v1"}]},
         "observations": [],
         "checks": [{"id": "auth-invariants", "claim_id": "authorization", "status": status,
                     "revision": HEAD, "source": {"name": "pytest", "version": "8"},
@@ -34,8 +39,8 @@ def make_input(*, path="src/auth.py", capacity=180, status="NOT_RUN", observatio
     return value
 
 
-def route(value):
-    return build_artifact(parse_input(json.dumps(value)))
+def route(value, policy=None):
+    return build_artifact(parse_input(json.dumps(value), json.dumps(policy or make_policy())))
 
 
 class AttentionRouterTests(unittest.TestCase):
@@ -96,8 +101,8 @@ class AttentionRouterTests(unittest.TestCase):
         self.assertEqual(result["attention"]["route"], "DEEP_REVIEW")
 
     def test_capacity_keeps_uncovered_work_visible(self):
-        value = make_input(capacity=20, status="NOT_RUN")
-        result = route(value)
+        value = make_input(status="NOT_RUN")
+        result = route(value, make_policy(capacity=20))
         attention = result["attention"]
         self.assertEqual(attention["known_demand_minutes"], 35)
         self.assertEqual(attention["scheduled_known_minutes"], 0)
@@ -110,19 +115,31 @@ class AttentionRouterTests(unittest.TestCase):
         second = route(copy.deepcopy(value))
         self.assertEqual(first, second)
         self.assertEqual(len(first["sha256"]), 64)
+        policy = dict(first["policy"])
+        digest = policy.pop("sha256")
+        expected = json.dumps(policy, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        self.assertEqual(digest, hashlib.sha256(expected).hexdigest())
+
+    def test_mr_input_cannot_override_the_separate_policy(self):
+        value = make_input()
+        value["policy"] = make_policy()
+        with self.assertRaises(ContractError):
+            parse_input(json.dumps(value), json.dumps(make_policy()))
 
     def test_parser_rejects_duplicate_json_keys(self):
         with self.assertRaises(ContractError):
-            parse_input('{"schema_version":"x","schema_version":"y"}')
+            parse_input('{"schema_version":"x","schema_version":"y"}', json.dumps(make_policy()))
 
     def test_parser_rejects_empty_policy_and_non_normalized_paths(self):
         value = make_input()
-        value["policy"]["claims"] = []
+        value = make_input()
+        policy = make_policy()
+        policy["claims"] = []
         with self.assertRaises(ContractError):
-            parse_input(json.dumps(value))
+            parse_input(json.dumps(value), json.dumps(policy))
         value = make_input(path="src/../auth.py")
         with self.assertRaises(ContractError):
-            parse_input(json.dumps(value))
+            parse_input(json.dumps(value), json.dumps(make_policy()))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # TO BUILD A FIRE — Technical README
 
-This document describes the intended system and distinguishes current behavior. The repository contains an early Python v1 input contract and deterministic local attention router. Its input currently trusts the caller's claims about check origin and artifacts; the CLI does not authenticate those claims. GitLab Duo integration, live MR evidence capture, connected demonstrations, corpus-level results, and measured outcomes are not implemented or verified yet.
+This document describes the intended system and distinguishes current behavior. The repository contains an early Python v1 input contract and deterministic local attention router. MR data and policy now use separate documents, but callers must still load policy from a trusted, protected location. The input currently trusts the caller's claims about check origin and artifacts; the CLI does not authenticate those claims. GitLab Duo integration, live MR evidence capture, connected demonstrations, corpus-level results, and measured outcomes are not implemented or verified yet.
 
 [English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
 

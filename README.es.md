@@ -180,11 +180,11 @@ El lenguaje de implementación elegido es Python. El proyecto usa la licencia MI
 
 ### Motor local de atención
 
-La CLI acepta un registro JSON acotado `tbaf.review-input/v1` y emite un recibo interno determinista, identificado por SHA-256. Los archivos modificados fuera del alcance de claims declarados y los candidatos obsoletos se enrutan a revisión profunda. Las observaciones candidatas no pueden despejar claims incluidos por policy; las verificaciones requeridas deben estar reportadas como exitosas para el SHA exacto del head. El esfuerzo desconocido permanece desconocido. La CLI todavía no autentica quién produjo cada verificación ni su artefacto: esta ruta sólo es tan confiable como la entrada que recibe.
+La CLI acepta un registro JSON no confiable y acotado `tbaf.review-input/v1` y un archivo separado `tbaf.policy/v1`, y emite un recibo interno determinista, identificado por SHA-256. Los archivos modificados fuera del alcance de claims declarados y los candidatos obsoletos se enrutan a revisión profunda. Las observaciones candidatas no pueden despejar claims incluidos por policy; las verificaciones requeridas deben estar reportadas como exitosas para el SHA exacto del head. El esfuerzo desconocido permanece desconocido. La policy debe venir de una ubicación confiable y protegida; la CLI todavía no autentica quién produjo cada verificación ni su artefacto, así que el recibo sólo evalúa los registros recibidos.
 
 ```bash
 python -m pip install -e .
-tbaf-route examples/review-input.json
+tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
 Este contrato local inicial cubre un MR; todavía no es una integración con GitLab, un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión.
