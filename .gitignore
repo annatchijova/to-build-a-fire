@@ -40,3 +40,6 @@ htmlcov/
 Thumbs.db
 .idea/
 .vscode/
+
+# Locally generated evaluation runs
+evaluation/results/

@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** concept and hackathon planning. This repository does not yet contain an implementation or measured results.
+> **Project status:** the Level 1 local routing core is implemented. GitLab Duo integration, live MR evidence capture, connected demonstrations, corpus-level metrics, and measured outcomes are not yet available.
 
 ## The problem
 
@@ -16,30 +16,37 @@ Sending every change to another AI reviewer can leave reviewers with the origina
 
 ## What it does
 
-TO BUILD A FIRE is an **attention router for merge requests**. It is intended to assemble an evidence package that helps a reviewer decide where to spend time. It does not treat an agent's confidence or a single risk score as proof.
+TO BUILD A FIRE is an **attention router for merge requests**. It allocates finite human review capacity to the changes where consequential uncertainty remains, and shows the reasons, locations, minutes demanded, and work left beyond capacity. A versioned `Review Package` is the internal contract that carries evidence between components; it is not the product. The system does not treat an agent's confidence or a single risk score as proof.
+
+**Agents produce observations. Verification produces bounded evidence. Policy routes attention. Humans resolve what remains consequential and uncertain.**
 
 ```mermaid
 flowchart TD
-    MR[Merge request] --> MAP[Map changed behavior and affected areas]
-    MAP --> EVIDENCE[Collect tests, scanners, ownership and policy evidence]
-    EVIDENCE --> CLAIMS[Track affected claims and their evidence]
-    CLAIMS --> DECISION{Evidence and policy sufficient?}
-    DECISION -->|Yes| COVERED[Evidence-covered under repository policy]
-    DECISION -->|Human judgment required| TARGET[Targeted review with exact locations]
-    DECISION -->|Cannot determine| ABSTAIN[ABSTAIN and explain the evidence gap]
-    DECISION -->|Explicit rule violated| DENY[DENY with the violated rule]
+    MR[Merge request] --> MAP[Change Mapper agent]
+    MAP --> CANDIDATES[Candidate observations]
+    CANDIDATES --> EVIDENCE[Evidence Engine: tests, CI, scanners, ownership, contracts]
+    EVIDENCE --> PACKAGE[Versioned Review Package: internal contract]
+    PACKAGE --> POLICY[Deterministic policy]
+    PACKAGE --> FALSIFIER[Falsifier agent: candidate counterexamples]
+    POLICY --> ROUTER[Attention Router]
+    FALSIFIER --> ROUTER
+    ROUTER --> COVERED[COVERED BY EVIDENCE]
+    ROUTER --> TARGET[TARGETED REVIEW]
+    ROUTER --> DEEP[DEEP REVIEW]
+    COVERED --> HUMAN[Human resolves consequential uncertainty]
+    TARGET --> HUMAN
+    DEEP --> HUMAN
 ```
 
-The intended outcomes are explainable states, not a score that hides its reasons:
+The router has three explainable attention routes:
 
-| Outcome | Meaning |
+| Route | Meaning |
 | --- | --- |
-| `ALLOW` | Required claims have the evidence required by the repository's policy. |
-| `REVIEW` | Policy or unresolved consequences call for human judgment. |
-| `ABSTAIN` | Available evidence is insufficient to reach a supported decision. |
-| `DENY` | The change violates an explicit rule, such as altering protected policy. |
+| `COVERED_BY_EVIDENCE` | Declared claims have the evidence required by the stated policy. This does not mean “safe” and does not authorize a merge. |
+| `TARGETED_REVIEW` | Specific consequential claims remain uncertain; the router shows the exact claims, evidence gaps, and locations to inspect. |
+| `DEEP_REVIEW` | Impact is broad, contradictory, or too uncertain for a narrow review; a person needs to assess the change more fully. |
 
-These are proposed product semantics; no decision engine exists yet.
+Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks; it is not yet connected to GitLab or live CI.
 
 ## A useful distinction
 
@@ -72,34 +79,52 @@ Line counts can help describe the diff, but they do not establish how much revie
 
 ## How it should behave
 
-An MR package should tell a reviewer what changed, which protected claims may be affected, what checks ran, what they establish, what remains uncertain, and where to look. If the available evidence does not support a decision, the system should say so and abstain.
+The Attention Router should tell a team how much human review is demanded, how much capacity is available, what falls beyond that capacity, and why. Each work item points to affected claims, source locations, evidence and its limits, policy, and the source of its time estimate. If the estimate is unsupported, the demand is `UNKNOWN`, not zero. Candidate claims from agents stay candidates until corroborated or adjudicated.
+
+For example, a team with 180 review minutes and 267 minutes of estimated demand sees 180 minutes scheduled and 87 still uncovered. “Scheduled” describes capacity allocation; it does not mean the code is evidence-covered or safe. These figures illustrate the intended display and are not measured project results.
+
+```text
+Review capacity today: 180 min
+Estimated demand:      267 min
+Scheduled:             180 min
+Still uncovered:        87 min
+
+Within capacity                 Still needing attention
+MR !82   auth       35 min       MR !109  auth       42 min
+MR !91   payments   50 min       MR !114  payments   45 min
+MR !77   infra      40 min
+MR !103  API        25 min
+MR !66   deps       30 min
+                         ───                           ───
+                         180                            87 min
+```
 
 ```mermaid
 sequenceDiagram
     participant MR as Merge request
     participant Agents as Investigation agents
     participant Checks as Deterministic checks
-    participant Policy as Repository policy
+    participant Falsifier as Falsifier agent
+    participant Policy as Deterministic policy
+    participant Router as Attention Router
     participant Human as Reviewer
-    MR->>Agents: Map the diff, dependencies, and candidate claims
+    MR->>Agents: Map the diff and propose candidate claims
     Agents->>Checks: Suggest relevant evidence to collect
-    Checks-->>Policy: Return test, scanner, and pipeline results
-    Agents-->>Policy: Return findings as untrusted inputs
-    Policy->>Policy: Evaluate required evidence and explicit rules
-    alt Evidence meets policy
-        Policy-->>MR: ALLOW with supporting evidence
-    else Human judgment is required
-        Policy-->>Human: REVIEW with claims and exact locations
-    else Evidence is insufficient
-        Policy-->>Human: ABSTAIN with the unresolved gap
-    else Explicit rule is violated
-        Policy-->>MR: DENY with the violated rule
-    end
+    Checks-->>Router: Scoped test, scanner, and CI observations
+    Agents-->>Policy: Candidate observations with provenance
+    Agents->>Falsifier: Submit claims and evidence to challenge
+    Falsifier-->>Router: Candidate counterexamples, never verdicts
+    Policy->>Router: Apply repository policy to structured evidence
+    Router->>Router: Compare human demand with declared capacity
+    Router-->>Human: Route work with evidence, locations, and cutoff
+    Human-->>Router: Resolve consequential uncertainty and record disposition
 ```
 
 ## Hackathon direction
 
-The planned demonstration contrasts a large, mostly generated change with a tiny authorization change. It should show how evidence and protected claims affect routing, rather than claim that the system has already reduced review time.
+The planned evaluation uses seeded changes and benign controls: generated diffs, dependency updates, formatting-only refactors, missing tests, two-line authorization widening, removed scanners, weakened assertions, reduced coverage thresholds, and CI commands ending in `|| true`. The initial inventory is in [`evaluation/corpus.json`](evaluation/corpus.json), with executable contract checks in `tests/`. It measures critical cases routed to people, unnecessary benign escalations, minutes of human review against a declared baseline, and unsupported conclusions. The target for unsupported candidate promotions is zero; no product-level metrics have been measured yet.
+
+The planned demonstration contrasts a large, mostly generated change with a tiny authorization change, then shows the attention demand against team capacity. It should show how evidence and protected claims affect routing, rather than claim that the system has already reduced review time.
 
 The concept maps to the post-code lifecycle the GitLab Transcend hackathon asks participants to explore:
 
@@ -135,8 +160,8 @@ The product is planned as a set of complete, connected levels. Each level is use
 
 ```mermaid
 flowchart LR
-    L1[1 · One MR, one repository<br/>Evidence-backed review package]
-    L2[2 · Team queue<br/>Route attention across MRs]
+    L1[1 · One MR, one repository<br/>Route attention by evidence and capacity]
+    L2[2 · Team attention scheduler<br/>Allocate capacity across MRs]
     L3[3 · Governed lifecycle<br/>Repair through monitor]
     L4[4 · Repository portfolio<br/>Cross-project contracts and learning]
     L1 --> L2 --> L3 --> L4
@@ -144,12 +169,23 @@ flowchart LR
 
 | Level | Complete, useful state |
 | --- | --- |
-| **1. Evidence-backed MR package** | A reviewer can use the system on a real merge request in one repository. It maps a change to declared claims, runs and records scoped checks, then produces `REVIEW`, `ABSTAIN`, or a policy-supported result with exact evidence and locations. GitLab Duo agents investigate; a deterministic policy evaluator owns the routing decision. |
-| **2. Team attention queue** | A team can see and order multiple open MRs by unresolved consequence, required expertise, and declared review capacity. Repository policies and ownership guide routing; reviewers can correct the package and record what required their attention. |
+| **1. Single-MR Attention Router** | Route a real MR's human work by evidence, consequential uncertainty, estimated minutes, and available capacity. |
+| **2. Team attention scheduler** | Allocate a shared review budget across MRs, expose the cutoff, and show consequential work still unreviewed. |
 | **3. Governed change lifecycle** | The system can propose bounded repairs, verify them, package evidence, apply explicit release gates, carry policy into configuration, and watch post-deploy signals. Human approvals and permitted agent actions are explicit; regressions reopen the evidence and review loop. |
 | **4. Repository portfolio** | Teams can apply compatible policies across related repositories, account for cross-project contracts and dependencies, and compare measured review effort and outcomes. Any tuning remains explainable and cannot silently weaken required evidence or policy. |
 
 The complete destination is a portfolio-aware attention system that follows a change from proposal through post-deploy evidence, directs human judgment to unresolved consequential claims, and records why each action was allowed, routed, or stopped. A hackathon deadline changes how many levels we attempt; it does not change the completion bar or make an unfinished level disposable. See the [Technical README](TECHNICAL_README.md#destination-and-build-levels) for level boundaries, completion evidence, and invariants inherited from the first level.
 
 The implementation language is Python. The project is licensed under the MIT License; see [LICENSE](LICENSE).
+
+### Local router core
+
+The CLI accepts a bounded `tbaf.review-input/v1` JSON record and emits a deterministic, SHA-256-addressed internal receipt. Changed files outside declared claim scope and stale candidates route to deep review. Candidate observations cannot clear policy-mapped claims; required checks must be reported as passing on the exact head revision before declared scope can be marked covered. Unknown effort stays unknown. The current CLI does not authenticate the check producer or artifact reference, so this route is only as trustworthy as the caller-provided input.
+
+```bash
+python -m pip install -e .
+tbaf-route examples/review-input.json
+```
+
+This local contract is an early single-MR core, not a GitLab integration, merge gate, safety verdict, or measured reviewer-time reduction.
 See [TODO.md](TODO.md) for the build plan and level completion criteria.

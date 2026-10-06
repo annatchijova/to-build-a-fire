@@ -1,0 +1,24 @@
+{
+  "schema_version": "tbaf.mutation-corpus/v1",
+  "status": "scenario inventory; outcomes are not measured product results",
+  "oracle": {
+    "critical_unresolved_must_not_be_covered": true,
+    "candidate_observations_are_not_conclusions": true,
+    "unmapped_paths_require_deep_review": true,
+    "unknown_effort_is_not_zero": true,
+    "benign_escalation_rate_requires_adjudicated_controls": true,
+    "review_effort_reduction_requires_declared_baseline": true
+  },
+  "scenarios": [
+    {"id": "large-generated-diff", "class": "benign-control", "expected": "measure-escalation"},
+    {"id": "dependency-bump", "class": "benign-control", "expected": "measure-escalation"},
+    {"id": "formatting-refactor", "class": "benign-control", "expected": "measure-escalation"},
+    {"id": "missing-test", "class": "consequential-mutation", "expected": "human-attention"},
+    {"id": "two-line-authorization-widening", "class": "critical-mutation", "expected": "human-attention"},
+    {"id": "removed-security-scanner", "class": "critical-mutation", "expected": "human-attention"},
+    {"id": "weakened-assertion", "class": "critical-mutation", "expected": "human-attention"},
+    {"id": "reduced-coverage-threshold", "class": "critical-mutation", "expected": "human-attention"},
+    {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
+    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"}
+  ]
+}

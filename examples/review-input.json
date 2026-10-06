@@ -1,0 +1,39 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 82,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "policy": {
+    "id": "service-review",
+    "version": "1",
+    "capacity_minutes": 90,
+    "claims": [
+      {
+        "id": "authorization-boundary",
+        "statement": "Authorization checks remain enforced.",
+        "consequence": "critical",
+        "path_globs": ["src/auth.py"],
+        "required_checks": ["authorization-invariants"],
+        "review_route": "targeted",
+        "attention_minutes": 35,
+        "estimate_source": "Example team estimate; replace with repository policy"
+      }
+    ]
+  },
+  "observations": [],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "NOT_RUN",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {"name": "pytest", "version": "example"},
+      "scope": "Authorization invariants; illustrative input only",
+      "artifact_ref": null
+    }
+  ]
+}

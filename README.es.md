@@ -16,30 +16,37 @@ Enviar cada cambio a otro revisor de IA puede dejar al reviewer con el diff orig
 
 ## Qué hace
 
-TO BUILD A FIRE es un **enrutador de atención para merge requests**. La idea es armar un paquete de evidencia que ayude al reviewer a decidir dónde invertir tiempo. No toma la confianza de un agente ni un único puntaje de riesgo como prueba.
+TO BUILD A FIRE es un **enrutador de atención para merge requests**. Asigna la capacidad humana finita a los cambios donde sigue habiendo incertidumbre consecuente, y muestra motivos, ubicaciones, minutos demandados y trabajo que queda fuera de la capacidad. Un `Review Package` versionado es el contrato interno que transporta evidencia entre componentes; no es el producto. El sistema no toma la confianza de un agente ni un puntaje único de riesgo como prueba.
+
+**Los agentes producen observaciones. La verificación produce evidencia acotada. La policy enruta atención. Las personas resuelven lo que sigue siendo consecuente e incierto.**
 
 ```mermaid
 flowchart TD
-    MR[Merge request] --> MAP[Mapear comportamiento y áreas afectadas]
-    MAP --> EVIDENCE[Reunir tests, scanners, responsables y políticas]
-    EVIDENCE --> CLAIMS[Registrar claims afectados y su evidencia]
-    CLAIMS --> DECISION{¿Alcanza la evidencia según la política?}
-    DECISION -->|Sí| COVERED[Cubierto por evidencia según la política del repo]
-    DECISION -->|Hace falta juicio humano| TARGET[Revisión dirigida con ubicaciones concretas]
-    DECISION -->|No se puede determinar| ABSTAIN[ABSTAIN y explicar la brecha de evidencia]
-    DECISION -->|Se viola una regla explícita| DENY[DENY e indicar la regla violada]
+    MR[Merge request] --> MAP[Agente Change Mapper]
+    MAP --> CANDIDATES[Observaciones candidatas]
+    CANDIDATES --> EVIDENCE[Evidence Engine: tests, CI, scanners, ownership, contratos]
+    EVIDENCE --> PACKAGE[Review Package versionado: contrato interno]
+    PACKAGE --> POLICY[Política determinista]
+    PACKAGE --> FALSIFIER[Agente Falsifier: contraejemplos candidatos]
+    POLICY --> ROUTER[Attention Router]
+    FALSIFIER --> ROUTER
+    ROUTER --> COVERED[COVERED BY EVIDENCE]
+    ROUTER --> TARGET[TARGETED REVIEW]
+    ROUTER --> DEEP[DEEP REVIEW]
+    COVERED --> HUMAN[La persona resuelve la incertidumbre consecuente]
+    TARGET --> HUMAN
+    DEEP --> HUMAN
 ```
 
-Los resultados propuestos son estados explicables, no un puntaje que oculte sus motivos:
+El router tiene tres rutas de atención explicables:
 
-| Resultado | Significado |
+| Ruta | Significado |
 | --- | --- |
-| `ALLOW` | Los claims requeridos tienen la evidencia exigida por la política del repositorio. |
-| `REVIEW` | La política o las consecuencias pendientes requieren juicio humano. |
-| `ABSTAIN` | La evidencia disponible no alcanza para tomar una decisión respaldada. |
-| `DENY` | El cambio viola una regla explícita, como modificar una política protegida. |
+| `COVERED_BY_EVIDENCE` | Los claims declarados tienen la evidencia requerida por la política indicada. No significa “seguro” ni autoriza un merge. |
+| `TARGETED_REVIEW` | Hay claims consecuentes cuya incertidumbre persiste; el router señala claims, brechas de evidencia y ubicaciones concretas. |
+| `DEEP_REVIEW` | El impacto es amplio, contradictorio o demasiado incierto para una revisión acotada; una persona debe evaluar el cambio en profundidad. |
 
-Son semánticas propuestas; todavía no existe un motor de decisión.
+Estados como `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED` y `NOT_RUN` describen qué establecieron las verificaciones. Son distintos de las rutas de atención. Los gates explícitos de merge o release son una decisión de política aparte. El motor local actual exige alcance declarado y verificaciones para el SHA exacto; todavía no está conectado a GitLab ni a CI en vivo.
 
 ## Una distinción útil
 
@@ -72,34 +79,52 @@ La cantidad de líneas ayuda a describir el diff, pero no determina cuánto hay 
 
 ## Comportamiento esperado
 
-El paquete de un MR debería explicar qué cambió, qué claims protegidos podrían verse afectados, qué verificaciones se ejecutaron, qué establecen, qué incertidumbre queda y dónde mirar. Si la evidencia no permite decidir, el sistema debería decirlo y abstenerse.
+El Attention Router debería indicar cuánta revisión humana se necesita, cuánta capacidad hay, qué queda fuera de esa capacidad y por qué. Cada tarea enlaza a los claims afectados, ubicaciones, evidencia y sus límites, política y origen del cálculo de tiempo. Si la estimación no tiene respaldo, la demanda es `UNKNOWN`, nunca cero. Los claims candidatos de los agentes siguen siendo candidatos hasta ser corroborados o adjudicados.
+
+Por ejemplo, un equipo con 180 minutos de revisión y una demanda estimada de 267 vería 180 minutos asignados y 87 todavía sin cubrir. “Asignado” describe el uso de capacidad; no significa que el código esté cubierto por evidencia ni que sea seguro. Las cifras ilustran la vista deseada y no son resultados medidos del proyecto.
+
+```text
+Capacidad de revisión hoy: 180 min
+Demanda estimada:          267 min
+Asignado:                  180 min
+Todavía sin cubrir:         87 min
+
+Dentro de capacidad              Aún necesita atención
+MR !82   auth       35 min        MR !109  auth       42 min
+MR !91   payments   50 min        MR !114  payments   45 min
+MR !77   infra      40 min
+MR !103  API        25 min
+MR !66   deps       30 min
+                         ───                            ───
+                         180                             87 min
+```
 
 ```mermaid
 sequenceDiagram
     participant MR as Merge request
     participant Agents as Agentes de investigación
     participant Checks as Verificaciones deterministas
-    participant Policy as Política del repositorio
+    participant Falsifier as Agente Falsifier
+    participant Policy as Política determinista
+    participant Router as Attention Router
     participant Human as Reviewer
-    MR->>Agents: Mapear diff, dependencias y claims candidatos
+    MR->>Agents: Mapear diff y proponer claims candidatos
     Agents->>Checks: Sugerir evidencia pertinente
-    Checks-->>Policy: Devolver resultados de tests, scanners y pipeline
-    Agents-->>Policy: Devolver hallazgos como entradas no confiables
-    Policy->>Policy: Evaluar evidencia requerida y reglas explícitas
-    alt La evidencia cumple la política
-        Policy-->>MR: ALLOW con evidencia de respaldo
-    else Hace falta juicio humano
-        Policy-->>Human: REVIEW con claims y ubicaciones concretas
-    else La evidencia no alcanza
-        Policy-->>Human: ABSTAIN con la brecha pendiente
-    else Se viola una regla explícita
-        Policy-->>MR: DENY con la regla violada
-    end
+    Checks-->>Router: Observaciones acotadas de tests, scanners y CI
+    Agents-->>Policy: Observaciones candidatas con provenance
+    Agents->>Falsifier: Presentar claims y evidencia para refutación
+    Falsifier-->>Router: Contraejemplos candidatos, nunca veredictos
+    Policy->>Router: Aplicar policy a evidencia estructurada
+    Router->>Router: Comparar demanda humana con capacidad declarada
+    Router-->>Human: Enrutar tareas con evidencia, ubicaciones y corte de capacidad
+    Human-->>Router: Resolver incertidumbre consecuente y registrar disposición
 ```
 
 ## Dirección para el hackathon
 
-La demo prevista contrasta un cambio grande, mayormente generado, con un cambio mínimo de autorización. Debería mostrar cómo la evidencia y los claims protegidos afectan el enrutamiento, sin afirmar que el sistema ya redujo el tiempo de revisión.
+La evaluación prevista usa cambios sembrados y controles benignos: diffs generados, actualizaciones de dependencias, refactors sólo de formato, tests faltantes, ampliación de autorización en dos líneas, scanners eliminados, assertions debilitadas, umbral de coverage reducido y comandos de CI que terminan en `|| true`. El inventario inicial está en [`evaluation/corpus.json`](evaluation/corpus.json), con comprobaciones ejecutables del contrato en `tests/`. Mide casos críticos enviados a personas, escalaciones benignas innecesarias, minutos humanos frente a una línea base declarada y conclusiones no respaldadas. El objetivo para promociones de candidatos sin evidencia es cero; todavía no hay métricas del producto.
+
+La demo prevista contrasta un cambio grande, mayormente generado, con un cambio mínimo de autorización y luego muestra la demanda de atención frente a la capacidad del equipo. Debería mostrar cómo la evidencia y los claims protegidos afectan el enrutamiento, sin afirmar que el sistema ya redujo el tiempo de revisión.
 
 El concepto se conecta con el ciclo post-código del hackathon GitLab Transcend:
 
@@ -135,8 +160,8 @@ El producto se plantea como niveles completos y conectados. Cada nivel sirve por
 
 ```mermaid
 flowchart LR
-    L1[1 · Un MR, un repositorio<br/>Paquete de revisión con evidencia]
-    L2[2 · Cola del equipo<br/>Enrutar atención entre MRs]
+    L1[1 · Un MR, un repositorio<br/>Enrutar atención por evidencia y capacidad]
+    L2[2 · Scheduler de atención humana<br/>Asignar capacidad entre MRs]
     L3[3 · Ciclo gobernado<br/>Reparar hasta monitorear]
     L4[4 · Cartera de repositorios<br/>Contratos entre proyectos y aprendizaje]
     L1 --> L2 --> L3 --> L4
@@ -144,12 +169,23 @@ flowchart LR
 
 | Nivel | Estado completo y útil |
 | --- | --- |
-| **1. Paquete de MR respaldado por evidencia** | Un reviewer puede usar el sistema con un merge request real de un repositorio. Mapea el cambio a claims declarados, ejecuta y registra verificaciones con alcance explícito, y produce `REVIEW`, `ABSTAIN` o un resultado respaldado por política, con evidencia y ubicaciones precisas. Los agentes de GitLab Duo investigan; un evaluador determinista de políticas decide el enrutamiento. |
-| **2. Cola de atención del equipo** | El equipo puede ordenar varios MRs abiertos según consecuencias sin resolver, experiencia requerida y capacidad de revisión declarada. Las políticas y responsables del repositorio guían el enrutamiento; los reviewers pueden corregir el paquete y registrar qué necesitó su atención. |
+| **1. Attention Router para un MR** | Enrutar el trabajo humano de un MR real según evidencia, incertidumbre consecuente, minutos estimados y capacidad disponible. |
+| **2. Scheduler de atención humana del equipo** | Asignar el presupuesto de revisión entre MRs, mostrar el corte de capacidad y el trabajo consecuente que sigue sin revisar. |
 | **3. Ciclo de cambio gobernado** | El sistema puede proponer reparaciones acotadas, verificarlas, armar evidencia, aplicar gates explícitos de release, trasladar políticas a la configuración y observar señales posteriores al despliegue. Las aprobaciones humanas y acciones permitidas a agentes son explícitas; las regresiones reabren el ciclo de evidencia y revisión. |
 | **4. Cartera de repositorios** | Los equipos pueden aplicar políticas compatibles a repositorios relacionados, contemplar contratos y dependencias entre proyectos, y comparar esfuerzo y resultados medidos de revisión. Cualquier ajuste sigue siendo explicable y no puede debilitar en silencio la evidencia o política requerida. |
 
 El destino completo es un sistema de atención que contempla una cartera de repositorios, sigue el cambio desde su propuesta hasta la evidencia posterior al despliegue, dirige el juicio humano a claims consecuentes aún sin resolver y registra por qué cada acción fue permitida, enrutada o detenida. El plazo del hackathon modifica cuántos niveles se intentan; no cambia el criterio de finalización ni vuelve descartable un nivel incompleto. El [README técnico](TECHNICAL_README.md#destination-and-build-levels) detalla los límites de cada nivel, la evidencia de finalización y los invariantes que se heredan desde el primero.
 
 El lenguaje de implementación elegido es Python. El proyecto usa la licencia MIT; ver [LICENSE](LICENSE).
+
+### Motor local de atención
+
+La CLI acepta un registro JSON acotado `tbaf.review-input/v1` y emite un recibo interno determinista, identificado por SHA-256. Los archivos modificados fuera del alcance de claims declarados y los candidatos obsoletos se enrutan a revisión profunda. Las observaciones candidatas no pueden despejar claims incluidos por policy; las verificaciones requeridas deben estar reportadas como exitosas para el SHA exacto del head. El esfuerzo desconocido permanece desconocido. La CLI todavía no autentica quién produjo cada verificación ni su artefacto: esta ruta sólo es tan confiable como la entrada que recibe.
+
+```bash
+python -m pip install -e .
+tbaf-route examples/review-input.json
+```
+
+Este contrato local inicial cubre un MR; todavía no es una integración con GitLab, un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión.
 El [plan de construcción](TODO.md) detalla los niveles y sus criterios de cierre.
