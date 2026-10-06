@@ -2,7 +2,7 @@
 
 [English](README.md) · [Español](README.es.md) · [README técnico](TECHNICAL_README.md)
 
-**La IA abarató la generación de código. La atención humana sigue siendo escasa.**
+![TO BUILD A FIRE — La IA abarató el código. La atención humana es escasa.](visual/banner.png)
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
@@ -123,6 +123,10 @@ Estas etapas describen el rumbo previsto, no integraciones terminadas. El uso de
 - `README.md` — descripción del proyecto y comportamiento esperado.
 - `README.es.md` — versión en español de la descripción.
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
+- `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
+- `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
+- `visual/` — banner del proyecto y futuros recursos gráficos.
+- `docs/red-team/` — revisiones adversariales de diseño y su evidencia.
 - `LICENSE` — licencia MIT, copyright © 2026 Anna Tchijova.
 
 ## Próximos pasos
@@ -148,3 +152,4 @@ flowchart LR
 El destino completo es un sistema de atención que contempla una cartera de repositorios, sigue el cambio desde su propuesta hasta la evidencia posterior al despliegue, dirige el juicio humano a claims consecuentes aún sin resolver y registra por qué cada acción fue permitida, enrutada o detenida. El plazo del hackathon modifica cuántos niveles se intentan; no cambia el criterio de finalización ni vuelve descartable un nivel incompleto. El [README técnico](TECHNICAL_README.md#destination-and-build-levels) detalla los límites de cada nivel, la evidencia de finalización y los invariantes que se heredan desde el primero.
 
 El lenguaje de implementación elegido es Python. El proyecto usa la licencia MIT; ver [LICENSE](LICENSE).
+El [plan de construcción](TODO.md) detalla los niveles y sus criterios de cierre.

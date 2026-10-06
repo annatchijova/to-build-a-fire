@@ -2,7 +2,7 @@
 
 [English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
 
-**AI made code generation cheap. Human attention is still scarce.**
+![TO BUILD A FIRE — AI made code cheap. Human attention is scarce.](visual/banner.png)
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
@@ -123,6 +123,10 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `README.md` — project overview and intended behavior.
 - `README.es.md` — Spanish version of the overview.
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
+- `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
+- `.gitignore` — local Python environments, caches, build output, and secrets.
+- `visual/` — project banner and future visual assets.
+- `docs/red-team/` — adversarial design reviews and their evidence.
 - `LICENSE` — MIT License, copyright © 2026 Anna Tchijova.
 
 ## Next steps
@@ -148,3 +152,4 @@ flowchart LR
 The complete destination is a portfolio-aware attention system that follows a change from proposal through post-deploy evidence, directs human judgment to unresolved consequential claims, and records why each action was allowed, routed, or stopped. A hackathon deadline changes how many levels we attempt; it does not change the completion bar or make an unfinished level disposable. See the [Technical README](TECHNICAL_README.md#destination-and-build-levels) for level boundaries, completion evidence, and invariants inherited from the first level.
 
 The implementation language is Python. The project is licensed under the MIT License; see [LICENSE](LICENSE).
+See [TODO.md](TODO.md) for the build plan and level completion criteria.
