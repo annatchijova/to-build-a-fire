@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** the local routing core, project checks, and a GitLab CI job that emits an example Review Package are present; the first live GitLab execution is not yet verified. That receipt uses illustrative input and is not an assessment of the pipeline's MR. End-to-end Duo automation, real MR evidence, protected approvals, Cloud Run deployment and monitoring are the Path B/Assisted Level 1 target, not completed features. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Project status:** the local routing core and GitLab CI jobs for an example receipt and a read-only, MR-bound snapshot are present; neither has yet been observed running in GitLab. The MR snapshot runs only on the default branch when supplied an MR IID, reads metadata with the short-lived job token, fetches the MR ref as Git data, and does not execute MR code. Duo flow execution, verified checks/scanners, protected approvals, Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
 ## The problem
 
@@ -192,5 +192,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-This local contract is an early single-MR core, not a GitLab integration, merge gate, safety verdict, or measured reviewer-time reduction.
+This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job is configured separately and still needs a live run.
 See [TODO.md](TODO.md) for the build plan and level completion criteria.

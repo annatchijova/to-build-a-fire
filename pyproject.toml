@@ -14,6 +14,7 @@ dependencies = []
 
 [project.scripts]
 tbaf-route = "tbaf.cli:main"
+tbaf-snapshot-mr = "tbaf.gitlab_mr_snapshot:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

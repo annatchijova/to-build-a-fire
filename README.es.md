@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** existen el router local, las verificaciones del proyecto y un job de GitLab CI que emite un Review Package de ejemplo; todavía no vimos ejecutarse ese pipeline en GitLab. El recibo usa datos ilustrativos: no evalúa el MR del pipeline. La automatización end to end con Duo, evidencia de un MR real, aprobaciones protegidas, despliegue a Cloud Run y monitoreo son el objetivo del Nivel 1 Path B/Assisted, no funciones terminadas. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Estado del proyecto:** existen el router local y jobs de GitLab CI para un recibo de ejemplo y una captura de MR real, de sólo lectura; todavía no vimos ejecutarse ninguno en GitLab. La captura del MR corre sólo en la rama por defecto cuando recibe un IID, lee los metadatos con el token efímero del job, descarga la referencia Git del MR como datos y no ejecuta su código. La ejecución del flow Duo, las verificaciones y scanners vinculados, las aprobaciones protegidas, el despliegue a Cloud Run y el monitoreo siguen pendientes dentro del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
 ## El problema
 
@@ -190,5 +190,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-Este contrato local inicial cubre un MR; todavía no es una integración con GitLab, un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión.
+Este contrato local inicial cubre un MR; no es un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión. El job de GitLab para capturar un MR en modo de sólo lectura está configurado, pero todavía necesita ejecutarse en vivo.
 El [plan de construcción](TODO.md) detalla los niveles y sus criterios de cierre.

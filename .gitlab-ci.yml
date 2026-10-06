@@ -34,3 +34,24 @@ attention-router-example:
     expire_in: 1 week
     paths:
       - artifacts/example-review-package.json
+
+# Run only on the default branch when an operator explicitly supplies an MR
+# IID. The job code and policy come from this default-branch revision; MR
+# source is fetched as Git data and is never checked out or executed.
+attention-router-mr-snapshot:
+  stage: verify
+  image: python:3.12
+  variables:
+    GIT_DEPTH: "0"
+    PYTHONDONTWRITEBYTECODE: "1"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $TBAF_MR_IID'
+    - when: never
+  script:
+    - mkdir -p artifacts
+    - PYTHONPATH=src python -m tbaf.gitlab_mr_snapshot "$TBAF_MR_IID" > artifacts/review-package.json
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - artifacts/review-package.json
