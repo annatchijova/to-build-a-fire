@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** existen el router local y un job para las verificaciones del proyecto; todavía no vimos ejecutarse ese pipeline en GitLab. La automatización end to end con Duo, evidencia de un MR real, aprobaciones protegidas, despliegue a Cloud Run y monitoreo son el objetivo del Nivel 1 Path B/Assisted, no funciones terminadas. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Estado del proyecto:** existen el router local, las verificaciones del proyecto y un job de GitLab CI que emite un Review Package de ejemplo; todavía no vimos ejecutarse ese pipeline en GitLab. El recibo usa datos ilustrativos: no evalúa el MR del pipeline. La automatización end to end con Duo, evidencia de un MR real, aprobaciones protegidas, despliegue a Cloud Run y monitoreo son el objetivo del Nivel 1 Path B/Assisted, no funciones terminadas. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
 
 ## El problema
 
