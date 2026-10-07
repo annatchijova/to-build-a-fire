@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** the local routing core and GitLab CI jobs for an example receipt and a read-only, MR-bound snapshot are present; neither has yet been observed running in GitLab. The MR snapshot runs only on the default branch when supplied an MR IID, reads metadata with the short-lived job token, fetches the MR ref as Git data, and does not execute MR code. Duo flow execution, verified checks/scanners, protected approvals, Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Project status:** GitLab has a live CI run (`2920061283`) that passed the test, example-router, and MR-snapshot jobs and produced a Review Package for benign control MR !1. Duo flow `1016156` also completed an MR diff assessment with a human Modify/Approve checkpoint and published an internal note. This proves one benign end-to-end review path; critical-change evaluation, security scanners, protected release, Cloud Run deployment, and runtime monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) for evidence and limits.
 
 ## The problem
 
@@ -46,7 +46,7 @@ The router has three explainable attention routes:
 | `TARGETED_REVIEW` | Specific consequential claims remain uncertain; the router shows the exact claims, evidence gaps, and locations to inspect. |
 | `DEEP_REVIEW` | Impact is broad, contradictory, or too uncertain for a narrow review; a person needs to assess the change more fully. |
 
-Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI is configured to run the project checks, but it is not yet connected to live MR evidence or a trusted decision gate.
+Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI has produced a live MR snapshot artifact, but the flow's candidate observations are not yet combined with that deterministic package or used by a trusted merge gate.
 
 ## A useful distinction
 
@@ -152,7 +152,7 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
 - `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
 - `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
-- `.gitlab/duo/flows/attention-review.yml` — first MR-mapping flow draft; the mapper is read-only and an internal-note write follows human approval. Not yet GitLab-validated or run.
+- `.gitlab/duo/flows/attention-review.yml` — validated MR-mapping flow; the mapper is read-only and an internal-note write follows a human checkpoint. One benign MR run completed; critical-change behavior remains to be evaluated.
 - `.gitlab-ci.yml` — current local contract test job; it is not a Duo flow or merge/deploy gate.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.
@@ -192,5 +192,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job is configured separately and still needs a live run.
+This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job has a live run and artifact, but is not yet integrated with mapper observations or a merge gate.
 See [TODO.md](TODO.md) for the build plan and level completion criteria.

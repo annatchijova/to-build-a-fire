@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** existen el router local y jobs de GitLab CI para un recibo de ejemplo y una captura de MR real, de sólo lectura; todavía no vimos ejecutarse ninguno en GitLab. La captura del MR corre sólo en la rama por defecto cuando recibe un IID, lee los metadatos con el token efímero del job, descarga la referencia Git del MR como datos y no ejecuta su código. La ejecución del flow Duo, las verificaciones y scanners vinculados, las aprobaciones protegidas, el despliegue a Cloud Run y el monitoreo siguen pendientes dentro del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Estado del proyecto:** GitLab ya tiene una ejecución CI (`2920061283`) que pasó los jobs de contratos, router de ejemplo y snapshot de MR y produjo un Review Package para el MR benigno de control !1. También terminó el flow Duo `1016156`: evaluó los diffs del MR, pasó por un checkpoint humano de Modify/Approve y publicó una nota interna. Esto prueba un recorrido benigno; todavía faltan evaluar cambios críticos, sumar scanners de seguridad, proteger release, desplegar en Cloud Run y monitorear en runtime para completar el Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) para la evidencia y sus límites.
 
 ## El problema
 
@@ -150,7 +150,7 @@ El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evide
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
 - `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
 - `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
-- `.gitlab/duo/flows/attention-review.yml` — primer flow de mapeo de MR; el mapper es de sólo lectura y una acción determinista publica la nota interna sólo tras aprobación humana. Falta validarlo y ejecutarlo en GitLab.
+- `.gitlab/duo/flows/attention-review.yml` — flow validado para mapear MRs; el mapper es de sólo lectura y la nota interna requiere un checkpoint humano. Ya completó una ejecución con un MR benigno; falta evaluar cambios críticos.
 - `.gitlab-ci.yml` — job actual de verificaciones locales del proyecto; todavía no es un flow Duo ni un gate de merge/deploy.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.
