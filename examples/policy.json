@@ -6,7 +6,7 @@
   "claims": [
     {
       "id": "authorization-boundary",
-      "statement": "Authorization checks remain enforced.",
+      "statement": "can_read_record denies unauthenticated users and authenticated non-owner non-admins, and permits authenticated owners or admins.",
       "consequence": "critical",
       "path_globs": ["src/auth.py"],
       "required_checks": ["authorization-invariants"],

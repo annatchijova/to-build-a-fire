@@ -37,7 +37,8 @@ attention-router-example:
 
 # Run only on the default branch when an operator explicitly supplies an MR
 # IID. The job code and policy come from this default-branch revision; MR
-# source is fetched as Git data and is never checked out or executed.
+# source is fetched as Git data and is never checked out or executed. The
+# authorization invariant probe statically interprets a bounded AST subset.
 attention-router-mr-snapshot:
   stage: verify
   image: python:3.12
