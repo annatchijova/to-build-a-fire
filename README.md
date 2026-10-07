@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** GitLab has a live CI run (`2920061283`) that passed the test, example-router, and MR-snapshot jobs and produced a Review Package for benign control MR !1. Duo flow `1016156` also completed an MR diff assessment with a human Modify/Approve checkpoint and published an internal note. This proves one benign end-to-end review path; critical-change evaluation, security scanners, protected release, Cloud Run deployment, and runtime monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) for evidence and limits.
+> **Project status:** GitLab Duo's read-only MR assessment flow and the default-branch MR snapshot have run against live merge requests. A benign control reached `DEEP_REVIEW` while its diff also changed an unmapped corpus file. After isolating a seeded authorization change to `src/auth.py`, the router returned `TARGETED_REVIEW` with the critical claim still `UNRESOLVED` because `authorization-invariants` was missing. The snapshot does not execute MR code and binds its result to the exact head SHA. This demonstrates the flow and routing path, not completed security verification or deployment. Scanners, protected release, Cloud Run deployment and runtime monitoring remain unfinished parts of Path B/Assisted Level 1. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) for run IDs and limits.
 
 ## The problem
 
@@ -46,7 +46,7 @@ The router has three explainable attention routes:
 | `TARGETED_REVIEW` | Specific consequential claims remain uncertain; the router shows the exact claims, evidence gaps, and locations to inspect. |
 | `DEEP_REVIEW` | Impact is broad, contradictory, or too uncertain for a narrow review; a person needs to assess the change more fully. |
 
-Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI has produced a live MR snapshot artifact, but the flow's candidate observations are not yet combined with that deterministic package or used by a trusted merge gate.
+Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI has produced live MR-bound routing receipts, but claim-specific checks, scanners and a trusted merge/release gate are not yet connected.
 
 ## A useful distinction
 
@@ -192,5 +192,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job has a live run and artifact, but is not yet integrated with mapper observations or a merge gate.
+This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job has run on two live MR revisions; its artifact is a routing receipt, not proof that required checks passed.
 See [TODO.md](TODO.md) for the build plan and level completion criteria.
