@@ -19,6 +19,7 @@
     {"id": "weakened-assertion", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "reduced-coverage-threshold", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
-    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"}
+    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
+    {"id": "authorization-boundary-live-control", "class": "critical-mutation", "expected": "human-attention", "scope": "synthetic unmerged src/auth.py fixture", "expected_route": "TARGETED_REVIEW"}
   ]
 }
