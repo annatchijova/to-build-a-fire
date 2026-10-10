@@ -6,11 +6,16 @@ spec:
       regex: '^([1-9][0-9]*)?$'
       description: "Optional merge request IID for an explicit snapshot run on the default branch."
 ---
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
 stages:
+  - test
   - verify
 
 variables:
   TBAF_MR_IID: "$[[ inputs.mr_iid ]]"
+  AST_ENABLE_MR_PIPELINES: "true"
 
 workflow:
   rules:

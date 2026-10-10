@@ -53,7 +53,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_gitlab_assessment_
 The stale-only fixture must produce `not_found`; a fixture containing both an
 older note and a valid exact-head note must link the exact-head note. The test
 also checks that the embedded Review Package, including its digest, route, and
-claims, is byte-for-byte equivalent as parsed JSON to the original package.
+claims, is structurally identical after JSON parsing to the original package.
 These are local deterministic fixtures; they measure linker behavior, not live
 GitLab false-positive or false-negative rates.
 
