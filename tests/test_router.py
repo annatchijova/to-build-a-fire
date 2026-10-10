@@ -114,6 +114,7 @@ class AttentionRouterTests(unittest.TestCase):
         first = route(value)
         second = route(copy.deepcopy(value))
         self.assertEqual(first, second)
+        self.assertEqual(first["schema_version"], "tbaf.review-package/v2")
         self.assertEqual(len(first["sha256"]), 64)
         policy = dict(first["policy"])
         digest = policy.pop("sha256")
@@ -129,6 +130,12 @@ class AttentionRouterTests(unittest.TestCase):
     def test_parser_rejects_duplicate_json_keys(self):
         with self.assertRaises(ContractError):
             parse_input('{"schema_version":"x","schema_version":"y"}', json.dumps(make_policy()))
+
+    def test_check_result_details_are_preserved_in_the_receipt(self):
+        value = make_input(status="FAIL")
+        value["checks"][0]["details"] = "FAIL: authenticated_non_owner_denied"
+        result = route(value)
+        self.assertEqual(result["checks"][0]["details"], "FAIL: authenticated_non_owner_denied")
 
     def test_parser_rejects_empty_policy_and_non_normalized_paths(self):
         value = make_input()
