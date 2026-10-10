@@ -1,5 +1,16 @@
+spec:
+  inputs:
+    mr_iid:
+      type: string
+      default: ""
+      regex: '^([1-9][0-9]*)?$'
+      description: "Optional merge request IID for an explicit snapshot run on the default branch."
+---
 stages:
   - verify
+
+variables:
+  TBAF_MR_IID: "$[[ inputs.mr_iid ]]"
 
 workflow:
   rules:
