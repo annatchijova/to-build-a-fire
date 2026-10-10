@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** the local routing core and GitLab CI jobs for an example receipt and a read-only, MR-bound snapshot are present; neither has yet been observed running in GitLab. The MR snapshot runs only on the default branch when supplied an MR IID, reads metadata with the short-lived job token, fetches the MR ref as Git data, and does not execute MR code. Duo flow execution, verified checks/scanners, protected approvals, Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Project status:** GitLab CI has produced a live, read-only MR snapshot and run a bounded authorization invariant check against a seeded control. For MR !2 at head `e843e0d`, the check reported `FAIL`; the Review Package kept the claim `UNRESOLVED` and routed it to `TARGETED_REVIEW`. The pipeline passed because it generated the receipt; that is not a pass for the authorization claim. The Duo MR flow has also been exercised with human-approved internal notes. Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) and the [live evidence record](docs/live-evidence-2026-10-09.md).
 
 ## The problem
 
@@ -46,7 +46,7 @@ The router has three explainable attention routes:
 | `TARGETED_REVIEW` | Specific consequential claims remain uncertain; the router shows the exact claims, evidence gaps, and locations to inspect. |
 | `DEEP_REVIEW` | Impact is broad, contradictory, or too uncertain for a narrow review; a person needs to assess the change more fully. |
 
-Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI is configured to run the project checks, but it is not yet connected to live MR evidence or a trusted decision gate.
+Evidence states such as `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED`, and `NOT_RUN` describe what checks established. They are separate from attention routes. Explicit merge or release gates are a separate policy decision. The current local core enforces declared path scope and exact-revision checks. GitLab CI now produces live MR evidence and runs a bounded authorization invariant check; this remains a routing aid, not a merge or deployment gate.
 
 ## A useful distinction
 
@@ -192,5 +192,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot job is configured separately and still needs a live run.
+This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot has run live; see the [recorded result](docs/live-evidence-2026-10-09.md).
 See [TODO.md](TODO.md) for the build plan and level completion criteria.

@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** existen el router local y jobs de GitLab CI para un recibo de ejemplo y una captura de MR real, de sólo lectura; todavía no vimos ejecutarse ninguno en GitLab. La captura del MR corre sólo en la rama por defecto cuando recibe un IID, lee los metadatos con el token efímero del job, descarga la referencia Git del MR como datos y no ejecuta su código. La ejecución del flow Duo, las verificaciones y scanners vinculados, las aprobaciones protegidas, el despliegue a Cloud Run y el monitoreo siguen pendientes dentro del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md).
+> **Estado del proyecto:** GitLab CI generó una captura de MR real, de sólo lectura, y ejecutó una verificación acotada de invariantes de autorización contra un control sembrado. Para el MR !2, sobre el head `e843e0d`, la verificación informó `FAIL`; el Review Package mantuvo el claim como `UNRESOLVED` y lo dirigió a `TARGETED_REVIEW`. La pipeline pasó porque produjo el recibo; eso no significa que el claim de autorización haya pasado. También se ejercitó el flow Duo con notas internas aprobadas por una persona. El despliegue a Cloud Run y el monitoreo siguen pendientes del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) y el [registro de evidencia en vivo](docs/live-evidence-2026-10-09.md).
 
 ## El problema
 
@@ -46,7 +46,7 @@ El router tiene tres rutas de atención explicables:
 | `TARGETED_REVIEW` | Hay claims consecuentes cuya incertidumbre persiste; el router señala claims, brechas de evidencia y ubicaciones concretas. |
 | `DEEP_REVIEW` | El impacto es amplio, contradictorio o demasiado incierto para una revisión acotada; una persona debe evaluar el cambio en profundidad. |
 
-Estados como `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED` y `NOT_RUN` describen qué establecieron las verificaciones. Son distintos de las rutas de atención. Los gates explícitos de merge o release son una decisión de política aparte. El motor local exige alcance declarado y verificaciones para el SHA exacto. GitLab CI está configurado para ejecutar las verificaciones del proyecto, pero aún no consume evidencia de un MR real ni funciona como gate confiable de decisión.
+Estados como `SUPPORTED`, `UNRESOLVED`, `CONTRADICTED` y `NOT_RUN` describen qué establecieron las verificaciones. Son distintos de las rutas de atención. Los gates explícitos de merge o release son una decisión de política aparte. El motor local exige alcance declarado y verificaciones para el SHA exacto. GitLab CI ya produce evidencia de MRs reales y ejecuta una verificación acotada de invariantes de autorización; sigue siendo una ayuda para dirigir la revisión, no un gate de merge o despliegue.
 
 ## Una distinción útil
 
@@ -190,5 +190,5 @@ python -m pip install -e .
 tbaf-route examples/review-input.json --policy examples/policy.json
 ```
 
-Este contrato local inicial cubre un MR; no es un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión. El job de GitLab para capturar un MR en modo de sólo lectura está configurado, pero todavía necesita ejecutarse en vivo.
+Este contrato local inicial cubre un MR; no es un gate de merge, un veredicto de seguridad ni una medición de reducción del tiempo de revisión. El job de GitLab para capturar un MR en modo de sólo lectura ya se ejecutó en vivo; ver el [registro del resultado](docs/live-evidence-2026-10-09.md).
 El [plan de construcción](TODO.md) detalla los niveles y sus criterios de cierre.
