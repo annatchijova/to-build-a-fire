@@ -6,7 +6,7 @@
 
 Cuando las personas y los agentes de programación pueden abrir más merge requests de las que un equipo alcanza a inspeccionar con cuidado, sumar otra corriente de comentarios automáticos puede agrandar la cola. TO BUILD A FIRE es una idea de producto para dirigir el esfuerzo de revisión: reunir evidencia sobre un cambio, identificar qué sigue sin resolverse e indicar dónde hace falta el juicio humano.
 
-> **Estado del proyecto:** GitLab CI generó una captura de MR real, de sólo lectura, y ejecutó una verificación acotada de invariantes de autorización contra un control sembrado. Para el MR !2, sobre el head `e843e0d`, la verificación informó `FAIL`; el Review Package mantuvo el claim como `UNRESOLVED` y lo dirigió a `TARGETED_REVIEW`. La pipeline pasó porque produjo el recibo; eso no significa que el claim de autorización haya pasado. También se ejercitó el flow Duo con notas internas aprobadas por una persona. El despliegue a Cloud Run y el monitoreo siguen pendientes del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) y el [registro de evidencia en vivo](docs/live-evidence-2026-10-09.md).
+> **Estado del proyecto:** GitLab CI generó una captura de MR real, de sólo lectura, y ejecutó una verificación acotada de invariantes de autorización contra un control sembrado. Para el MR !2, sobre el head `e843e0d`, la verificación informó `FAIL`; el Review Package mantuvo el claim como `UNRESOLVED` y lo dirigió a `TARGETED_REVIEW`. La pipeline pasó porque produjo el recibo; eso no significa que el claim de autorización haya pasado. El flow Duo se ejercitó con notas internas aprobadas por una persona. El linker CI que une candidatos con el Review Package está en el [MR !8 de GitLab](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/merge_requests/8); su pipeline de MR pasó, pero falta ejecutar el job de ingestión de notas en una pipeline de `main`. El despliegue a Cloud Run y el monitoreo siguen pendientes del Nivel 1 Path B/Assisted. Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) y el [registro de evidencia en vivo](docs/live-evidence-2026-10-09.md).
 
 ## El problema
 
@@ -150,8 +150,8 @@ El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evide
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
 - `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
 - `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
-- `.gitlab/duo/flows/attention-review.yml` — primer flow de mapeo de MR; el mapper es de sólo lectura y una acción determinista publica la nota interna sólo tras aprobación humana. Falta validarlo y ejecutarlo en GitLab.
-- `.gitlab-ci.yml` — job actual de verificaciones locales del proyecto; todavía no es un flow Duo ni un gate de merge/deploy.
+- `.gitlab/duo/flows/attention-review.yml` — configuración versionada del flow de mapeo de MR. El flow activo del proyecto es otro objeto en GitLab; hay que mantenerlo sincronizado antes de depender de su evaluación JSON estructurada.
+- `.gitlab-ci.yml` — jobs de contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Producen evidencia de revisión; no habilitan merge ni despliegue.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.
 - `docs/red-team/` — revisiones adversariales de diseño y su evidencia.

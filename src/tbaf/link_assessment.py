@@ -82,11 +82,24 @@ def _verified_package(data: bytes) -> dict[str, Any]:
 def _assessment_observations(
     package: dict[str, Any], assessment_data: bytes,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    try:
+        assessment_text = assessment_data.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise ContractError("Duo assessment must be UTF-8") from exc
+    json_blocks = re.findall(
+        r"```json[ \t]*\r?\n(.*?)\r?\n```",
+        assessment_text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if json_blocks:
+        if len(json_blocks) != 1:
+            raise ContractError("Duo assessment must contain exactly one fenced JSON block")
+        assessment_data = json_blocks[0].encode("utf-8")
     assessment = _decode_json(assessment_data, "Duo assessment")
     assessment = _keys(
         assessment,
-        {"schema_version", "change", "policy_sha256", "source", "observations"},
-        {"schema_version", "change", "policy_sha256", "source", "observations"},
+        {"schema_version", "change", "source", "observations"},
+        {"schema_version", "change", "source", "observations"},
         "Duo assessment",
     )
     if assessment["schema_version"] != "tbaf.duo-assessment/v1":
@@ -113,22 +126,15 @@ def _assessment_observations(
         if identity[key] != expected_change.get(key):
             raise ContractError(f"Duo assessment {key} does not match the Review Package")
 
-    policy_digest = assessment["policy_sha256"]
-    package_policy_digest = package["policy"]["sha256"]
-    if (not isinstance(policy_digest, str) or not _HEX_256_RE.fullmatch(policy_digest)
-            or policy_digest != package_policy_digest):
-        raise ContractError("Duo assessment policy_sha256 does not match the Review Package")
-
     source = _keys(
-        assessment["source"], {"flow_id", "session_id", "agent", "version"},
-        {"flow_id", "session_id", "agent", "version"}, "Duo assessment source",
+        assessment["source"], {"agent", "version"},
+        {"agent", "version"}, "Duo assessment source",
     )
     source_record = {
-        "flow_id": _identity(source["flow_id"], "Duo assessment source.flow_id"),
-        "session_id": _identity(source["session_id"], "Duo assessment source.session_id"),
         "agent": _identity(source["agent"], "Duo assessment source.agent"),
         "version": _text(source["version"], "Duo assessment source.version", limit=128),
         "authentication": "reported_by_input_not_independently_verified",
+        "bound_policy_sha256": package["policy"]["sha256"],
     }
 
     policy = dict(package["policy"])
@@ -150,6 +156,7 @@ def _assessment_observations(
            or item["source"]["version"] != source_record["version"]
            for item in parsed["observations"]):
         raise ContractError("candidate observation source must match the assessment source")
+    source_record["assessment_sha256"] = hashlib.sha256(assessment_data).hexdigest()
     return source_record, parsed["observations"]
 
 

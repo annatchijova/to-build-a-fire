@@ -6,7 +6,7 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** GitLab CI has produced a live, read-only MR snapshot and run a bounded authorization invariant check against a seeded control. For MR !2 at head `e843e0d`, the check reported `FAIL`; the Review Package kept the claim `UNRESOLVED` and routed it to `TARGETED_REVIEW`. The pipeline passed because it generated the receipt; that is not a pass for the authorization claim. The Duo MR flow has also been exercised with human-approved internal notes. Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) and the [live evidence record](docs/live-evidence-2026-10-09.md).
+> **Project status:** GitLab CI has produced a live, read-only MR snapshot and run a bounded authorization invariant check against a seeded control. For MR !2 at head `e843e0d`, the check reported `FAIL`; the Review Package kept the claim `UNRESOLVED` and routed it to `TARGETED_REVIEW`. The pipeline passed because it generated the receipt; that is not a pass for the authorization claim. The Duo MR flow has been exercised with human-approved internal notes. The candidate-to-package CI linker is in [GitLab MR !8](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/merge_requests/8); its MR pipeline passed, but the default-branch note-ingestion job still needs a live run. Cloud Run deployment and monitoring remain unfinished parts of the Path B/Assisted Level 1 target. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md) and the [live evidence record](docs/live-evidence-2026-10-09.md).
 
 ## The problem
 
@@ -143,7 +143,7 @@ flowchart LR
     MONITOR -. regression .-> PLAN
 ```
 
-These stages describe the intended direction, not completed integrations. GitLab Duo Agent Platform use is a hackathon requirement and remains to be implemented.
+These stages describe the intended direction, not completed integrations. GitLab Duo has been used for MR mapping and human-approved internal notes; the complete nine-stage workflow, including release, deployment, and monitoring, remains unfinished.
 
 ## Repository map
 
@@ -152,8 +152,8 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
 - `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
 - `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
-- `.gitlab/duo/flows/attention-review.yml` — first MR-mapping flow draft; the mapper is read-only and an internal-note write follows human approval. Not yet GitLab-validated or run.
-- `.gitlab-ci.yml` — current local contract test job; it is not a Duo flow or merge/deploy gate.
+- `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
+- `.gitlab-ci.yml` — contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. These jobs produce review evidence; they do not gate merge or deployment.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.
 - `docs/red-team/` — adversarial design reviews and their evidence.

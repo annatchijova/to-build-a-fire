@@ -2,22 +2,42 @@
 
 `tbaf-link-assessment` creates a `tbaf.review-package-link/v1` envelope from a
 deterministic `tbaf.review-package/v2` artifact and a structured
-`tbaf.duo-assessment/v1` candidate file. It rejects a mismatch in project,
-merge-request IID, head SHA, or policy digest. Candidate locations must belong
-to paths changed by the MR, and each observation revision must equal the
+`tbaf.duo-assessment/v1` candidate assessment. The input can be a JSON file or
+a human-readable note containing exactly one fenced `json` block. It rejects a
+mismatch in project, merge-request IID, or head SHA. Candidate locations must
+belong to paths changed by the MR, and each observation revision must equal the
 package head SHA.
 
 The envelope embeds the original package unchanged. Its route, claims, checks,
 and schedule are not recalculated or modified by this command. Duo observations
-remain `CANDIDATE`; the reported flow/session provenance is explicitly marked
-as not independently authenticated. The envelope's SHA-256 detects changes
-relative to the supplied file, but does not establish who created that file.
-Use a trusted GitLab artifact or another verified transport for the package.
+remain `CANDIDATE`; the reported agent provenance is explicitly marked
+as not independently authenticated. The package's policy digest is recorded
+in the envelope; the Change Mapper does not claim to have inspected that
+policy. The envelope's SHA-256 detects changes relative to the supplied files,
+but does not establish who created them. Verify the GitLab project, pipeline,
+job, and commit when obtaining the package artifact.
 
-The current GitLab flow emits a human-readable assessment, not this structured
-input schema. This command is a local integration primitive; converting the
-active flow to produce a structured assessment and passing the CI artifact into
-this command are still required for an automated end-to-end connection.
+The checked-in flow YAML requests a human-readable assessment plus exactly one
+structured JSON block. The active GitLab UI flow is a separate object and must
+be updated from the checked-in configuration before its notes use this schema.
+
+On the default branch, `.gitlab-ci.yml` runs
+`tbaf.gitlab_assessment_link` after the MR snapshot job when `TBAF_MR_IID` is
+set. It reads MR notes with `CI_JOB_TOKEN`, considers only internal notes
+authored by the configured Change Mapper user, and accepts only a structured
+assessment that matches the Review Package project, IID, and head SHA. It
+publishes `assessment-link-status.json` and, when linked,
+`linked-review-package.json` as artifacts. The deterministic package and its
+route remain unchanged.
+
+The GitLab Notes API exposes the note author and confidentiality but does not
+attest which flow created a note. The linked artifact therefore records the
+configured flow ID as context and marks flow identity as
+`configured_not_attested_by_notes_api`. It also does not independently
+authenticate the agent's claimed source. If the job token cannot read MR notes,
+the job publishes `status: unavailable` rather than implying that no assessment
+exists. A successful CI run must still be checked for `status: linked` before
+using the candidate observations.
 
 ## Input shape
 
@@ -29,21 +49,21 @@ this command are still required for an automated end-to-end connection.
     "mr_iid": 2,
     "head_sha": "<40-character lowercase Git SHA>"
   },
-  "policy_sha256": "<64-character lowercase SHA-256>",
   "source": {
-    "flow_id": "1016156",
-    "session_id": "9114560",
     "agent": "inspect_mr",
-    "version": "<reported agent version>"
+    "version": "1"
   },
   "observations": []
 }
 ```
 
-Each observation uses the existing `tbaf.review-input/v1` observation shape,
+The note can include human-readable context outside the single JSON block. Each
+observation uses the existing `tbaf.review-input/v1` observation shape,
 including `id`, `kind`, `claim_id`, `impact`, `source`, `revision`, `scope`,
 `text`, and `locations`. Its `source.agent` and `source.version` must match the
-assessment source above.
+assessment source above. Set `change.project`, `change.mr_iid`, and
+`change.head_sha` from the MR record supplied to the flow. This tool validates
+them against the deterministic package before linking.
 
 ## Local command
 
