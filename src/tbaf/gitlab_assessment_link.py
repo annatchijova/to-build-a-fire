@@ -113,7 +113,13 @@ def _note_metadata(note: dict[str, Any], config: dict[str, Any]) -> dict[str, An
     author_id = author.get("id")
     if isinstance(author_id, bool) or author_id != config["change_mapper_user_id"]:
         return None
-    if note.get("confidential") is not True or note.get("system") is True:
+    internal = note.get("internal")
+    if note.get("system") is True:
+        return None
+    if internal is not None:
+        if internal is not True:
+            return None
+    elif note.get("confidential") is not True:
         return None
     note_id = note.get("id")
     if isinstance(note_id, bool) or not isinstance(note_id, int) or note_id < 1:
@@ -127,7 +133,7 @@ def _note_metadata(note: dict[str, Any], config: dict[str, Any]) -> dict[str, An
     return {
         "note_id": note_id,
         "author_id": author_id,
-        "confidential": True,
+        "internal": True,
         # The Notes API does not attest which flow created a note. Keep the
         # configured flow as context, not as verified provenance.
         "configured_flow_id": config["flow_id"],
@@ -155,7 +161,7 @@ def link_latest_assessment(
         linked.pop("sha256", None)
         linked["change_mapper"]["gitlab_note"] = {
             key: metadata[key]
-            for key in ("note_id", "author_id", "confidential", "configured_flow_id", "created_at")
+            for key in ("note_id", "author_id", "internal", "configured_flow_id", "created_at")
         }
         linked["change_mapper"]["gitlab_note"]["flow_identity"] = "configured_not_attested_by_notes_api"
         linked["sha256"] = hashlib.sha256(_canonical_bytes(linked)).hexdigest()
