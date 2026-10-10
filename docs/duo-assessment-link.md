@@ -17,12 +17,27 @@ policy. The envelope's SHA-256 detects changes relative to the supplied files,
 but does not establish who created them. Verify the GitLab project, pipeline,
 job, and commit when obtaining the package artifact.
 
-The checked-in flow YAML now requests a human-readable assessment plus exactly
-one structured JSON block. The active GitLab UI flow is a separate object and
-must be updated from the checked-in configuration before its notes use this
-schema. Fetching the correct CI artifact and note automatically is still
-required for an end-to-end connection; this command currently accepts local
-files and does not contact GitLab.
+The checked-in flow YAML requests a human-readable assessment plus exactly one
+structured JSON block. The active GitLab UI flow is a separate object and must
+be updated from the checked-in configuration before its notes use this schema.
+
+On the default branch, `.gitlab-ci.yml` runs
+`tbaf.gitlab_assessment_link` after the MR snapshot job when `TBAF_MR_IID` is
+set. It reads MR notes with `CI_JOB_TOKEN`, considers only confidential notes
+authored by the configured Change Mapper user, and accepts only a structured
+assessment that matches the Review Package project, IID, and head SHA. It
+publishes `assessment-link-status.json` and, when linked,
+`linked-review-package.json` as artifacts. The deterministic package and its
+route remain unchanged.
+
+The GitLab Notes API exposes the note author and confidentiality but does not
+attest which flow created a note. The linked artifact therefore records the
+configured flow ID as context and marks flow identity as
+`configured_not_attested_by_notes_api`. It also does not independently
+authenticate the agent's claimed source. If the job token cannot read MR notes,
+the job publishes `status: unavailable` rather than implying that no assessment
+exists. A successful CI run must still be checked for `status: linked` before
+using the candidate observations.
 
 ## Input shape
 
