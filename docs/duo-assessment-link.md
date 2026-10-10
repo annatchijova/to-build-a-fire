@@ -23,7 +23,7 @@ be updated from the checked-in configuration before its notes use this schema.
 
 On the default branch, `.gitlab-ci.yml` runs
 `tbaf.gitlab_assessment_link` after the MR snapshot job when `TBAF_MR_IID` is
-set. It reads MR notes with `CI_JOB_TOKEN`, considers only confidential notes
+set. It reads MR notes with `CI_JOB_TOKEN`, considers only internal notes
 authored by the configured Change Mapper user, and accepts only a structured
 assessment that matches the Review Package project, IID, and head SHA. It
 publishes `assessment-link-status.json` and, when linked,
