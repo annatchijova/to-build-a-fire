@@ -262,7 +262,7 @@ def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
     for index, item in enumerate(_list(top["checks"], "checks", maximum=MAX_ITEMS)):
         where = f"checks[{index}]"
         check = _keys(item, {"id", "claim_id", "status", "revision", "source", "scope", "artifact_ref"},
-                      {"id", "claim_id", "status", "revision", "source", "scope", "artifact_ref"}, where)
+                      {"id", "claim_id", "status", "revision", "source", "scope", "artifact_ref", "details"}, where)
         check_id = _identity(check["id"], f"{where}.id")
         if check_id in seen_checks:
             raise ContractError(f"duplicate check id: {check_id}")
@@ -278,7 +278,7 @@ def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
         artifact_ref = check["artifact_ref"]
         if artifact_ref is not None:
             artifact_ref = _text(artifact_ref, f"{where}.artifact_ref", limit=2048)
-        checks.append({
+        check_record = {
             "id": check_id,
             "claim_id": claim_id,
             "status": status,
@@ -289,7 +289,10 @@ def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
             },
             "scope": _text(check["scope"], f"{where}.scope", limit=MAX_TEXT),
             "artifact_ref": artifact_ref,
-        })
+        }
+        if "details" in check:
+            check_record["details"] = _text(check["details"], f"{where}.details", limit=2_000)
+        checks.append(check_record)
 
     known_claims = {claim["id"] for claim in claims}
     for check in checks:

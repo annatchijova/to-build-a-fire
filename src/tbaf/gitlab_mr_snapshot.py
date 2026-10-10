@@ -20,6 +20,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+from .auth_invariants import MAX_SOURCE_BYTES, build_authorization_check
 from .contract import ContractError, parse_input
 from .router import build_artifact
 
@@ -208,6 +209,15 @@ def create_snapshot(mr_iid: str) -> dict[str, Any]:
     _git(["cat-file", "-e", f"{base_sha}^{{commit}}"])
 
     policy_data = _git(["show", f"{policy_revision}:examples/policy.json"])
+    changed_paths = _changed_paths(base_sha, head_sha)
+    checks: list[dict[str, Any]] = []
+    if "src/auth.py" in changed_paths:
+        try:
+            auth_source = _git(["show", f"{head_sha}:src/auth.py"], maximum_output=MAX_SOURCE_BYTES)
+        except ContractError:
+            auth_source = None
+        checks.append(build_authorization_check(auth_source, head_sha))
+
     review_input = {
         "schema_version": "tbaf.review-input/v1",
         "change": {
@@ -215,10 +225,10 @@ def create_snapshot(mr_iid: str) -> dict[str, Any]:
             "mr_iid": int(mr_iid),
             "base_sha": base_sha,
             "head_sha": head_sha,
-            "paths": _changed_paths(base_sha, head_sha),
+            "paths": changed_paths,
         },
         "observations": [],
-        "checks": [],
+        "checks": checks,
     }
     parsed = parse_input(json.dumps(review_input, ensure_ascii=False), policy_data)
     return build_artifact(parsed)

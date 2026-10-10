@@ -1,6 +1,6 @@
 # TO BUILD A FIRE — Technical README
 
-This document describes the intended system and distinguishes current behavior. The repository contains an early Python v1 input contract and deterministic local attention router. MR data and policy now use separate documents, but callers must still load policy from a trusted, protected location. The input currently trusts the caller's claims about check origin and artifacts; the CLI does not authenticate those claims. GitLab Duo integration, live MR evidence capture, connected demonstrations, corpus-level results, and measured outcomes are not implemented or verified yet.
+This document describes the intended system and distinguishes current behavior. The repository contains an early Python v1 input contract and deterministic local attention router. GitLab Duo assessment and read-only MR snapshot paths have been exercised on live MRs. This branch adds a bounded static authorization check to the default-branch snapshot job; it still needs to land on the protected default branch and run against the critical MR before it counts as live evidence. Arbitrary caller-supplied checks remain unauthenticated by the local CLI.
 
 [English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
 
@@ -95,6 +95,12 @@ The deterministic policy and router explain which rule and evidence produced the
 Agents may map changes, find candidate claims, propose relevant tests, identify suspicious call paths, draft repairs, and summarize evidence. Agent output is an untrusted observation: it can be incomplete, mistaken, or contradicted. It must not edit the policy that authorizes it, convert its own claim into proof, or silently change the decision rules.
 
 Tests, scanners, and policy checks are also bounded evidence sources. Their existence does not establish effectiveness. The system must record versions and inputs and state what each check covered. A green pipeline is not a universal correctness claim.
+
+### Bounded authorization invariant probe
+
+The snapshot job contains a static AST interpreter for the sample `src/auth.py:can_read_record` contract. It reads the blob at the MR head SHA as bytes and never imports or executes MR code. For the supported expression subset, it checks all eight combinations of authentication, administrator status, and owner equality against the declared rule: unauthenticated callers are denied; authenticated admins and owners are allowed; authenticated non-owner, non-admin callers are denied. Unsupported syntax, a missing function, or oversized/malformed source returns `NOT_RUN` and leaves the policy claim unresolved. A counterexample returns `FAIL`, which also routes to human review.
+
+The probe is deliberately narrow. It does not establish whether the function is imported or reachable, whether callers pass trustworthy user/record objects, or whether other authorization paths exist. A `PASS` supports only this function's behavior under the documented AST subset; it is not a repository-wide security verdict. Full scope and scenario details are in [`docs/authorization-invariant-check.md`](docs/authorization-invariant-check.md).
 
 The policy evaluator is the intended decision boundary. It should be deterministic for a fixed policy, input revision, and evidence set. The exact implementation and serialization format have not been selected.
 
