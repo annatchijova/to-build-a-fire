@@ -30,6 +30,18 @@ publishes `assessment-link-status.json` and, when linked,
 `linked-review-package.json` as artifacts. The deterministic package and its
 route remain unchanged.
 
+To request a snapshot from a terminal, the pipeline exposes a validated
+`mr_iid` input. On a `glab` version that supports pipeline inputs, run:
+
+```sh
+glab ci run --branch main --input 'mr_iid:2'
+```
+
+The input accepts an empty value for ordinary pipelines or a positive decimal
+MR IID. It maps to `TBAF_MR_IID` only inside the pipeline configuration, so a
+user does not need permission to override pipeline variables. Older `glab`
+versions without `--input` must be upgraded before using this command.
+
 The GitLab Notes API exposes the note author and confidentiality but does not
 attest which flow created a note. The linked artifact therefore records the
 configured flow ID as context and marks flow identity as
