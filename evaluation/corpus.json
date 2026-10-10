@@ -1,6 +1,6 @@
 {
   "schema_version": "tbaf.mutation-corpus/v1",
-  "status": "scenario inventory; outcomes are not measured product results",
+  "status": "inventory; linker controls are enforced by tests/test_gitlab_assessment_link.py; live rates are unmeasured",
   "oracle": {
     "critical_unresolved_must_not_be_covered": true,
     "candidate_observations_are_not_conclusions": true,
@@ -19,6 +19,8 @@
     {"id": "weakened-assertion", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "reduced-coverage-threshold", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
-    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"}
+    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
+    {"id": "duo-assessment-stale-head", "class": "stale-evidence-control", "expected": "no-link"},
+    {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"}
   ]
 }

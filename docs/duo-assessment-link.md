@@ -42,6 +42,21 @@ MR IID. It maps to `TBAF_MR_IID` only inside the pipeline configuration, so a
 user does not need permission to override pipeline variables. Older `glab`
 versions without `--input` must be upgraded before using this command.
 
+## Exact-head linker controls
+
+Run the focused local evaluation with:
+
+```sh
+PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_gitlab_assessment_link.py' -v
+```
+
+The stale-only fixture must produce `not_found`; a fixture containing both an
+older note and a valid exact-head note must link the exact-head note. The test
+also checks that the embedded Review Package, including its digest, route, and
+claims, is byte-for-byte equivalent as parsed JSON to the original package.
+These are local deterministic fixtures; they measure linker behavior, not live
+GitLab false-positive or false-negative rates.
+
 The GitLab Notes API exposes the note author and confidentiality but does not
 attest which flow created a note. The linked artifact therefore records the
 configured flow ID as context and marks flow identity as
