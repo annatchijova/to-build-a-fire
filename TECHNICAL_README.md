@@ -1,6 +1,6 @@
 # TO BUILD A FIRE — Technical README
 
-This document describes the intended system and distinguishes current behavior. The repository contains an early Python v1 input contract and deterministic local attention router. GitLab Duo assessment and read-only MR snapshot paths have been exercised on live MRs. This branch adds a bounded static authorization check to the default-branch snapshot job; it still needs to land on the protected default branch and run against the critical MR before it counts as live evidence. Arbitrary caller-supplied checks remain unauthenticated by the local CLI.
+This document describes the intended system and distinguishes current behavior. The repository contains a Python input contract, deterministic local attention router, read-only MR snapshot, bounded authorization invariant check, and SHA-bound linker for structured Duo candidate assessments. GitLab Duo has been exercised on live MRs with human approval before internal notes are posted. The linker and its default-branch CI job are being reviewed in GitLab MR !8; a live default-branch run is still needed to verify job-token access to MR notes. Arbitrary caller-supplied checks remain unauthenticated by the local CLI.
 
 [English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
 
