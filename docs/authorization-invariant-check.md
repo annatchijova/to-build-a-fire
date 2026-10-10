@@ -35,6 +35,24 @@ the seeded authenticated non-owner bypass fails while a safe implementation
 passes. The added check details are part of Review Package v2; earlier v1
 artifacts remain unchanged and inspectable as archived CI artifacts.
 
+## Live GitLab run
+
+The project owner reported that snapshot pipeline
+[#2932600822](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2932600822)
+passed and its `attention-router-mr-snapshot` job
+[#17075661487](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/jobs/17075661487)
+produced an artifact for MR !2 at head
+`e843e0d8128f5c6363d47e6272850fb709e4badc`. The only changed path was
+`src/auth.py`. The artifact reported `authorization-invariants: FAIL`, left
+`authorization-boundary` `UNRESOLVED`, and routed it to `TARGETED_REVIEW` with
+reason `required_check_fail:authorization-invariants`. The check's failure is
+the expected detection result for this seeded control; the CI pipeline itself
+passed because it successfully generated the receipt.
+
+The earlier artifact for the same head reported
+`required_check_missing:authorization-invariants`. See the provenance and
+scope limits in [`live-evidence-2026-10-09.md`](live-evidence-2026-10-09.md).
+
 ## Limits
 
 This is evidence about one function's behavior under the supported static
