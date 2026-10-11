@@ -15,29 +15,29 @@ Open `http://localhost:8080` and check `http://localhost:8080/healthz`.
 
 ## GitLab OIDC setup
 
-The protected manual deploy job requires a Google Workload Identity Federation provider and a deploy service account. Do not store a service-account key in GitLab.
+The protected-main manual deploy job requires a Google Workload Identity Federation provider and a deploy service account. Do not store a service-account key in GitLab. From a terminal authenticated with the Google account that can manage IAM in `vigia-497422` and a GitLab CLI with API write access, run:
 
-1. Enable Cloud Run, Cloud Build, Artifact Registry, IAM Credentials, and Security Token Service APIs in project `vigia-497422`.
-2. Create a Workload Identity Pool named `gitlab` and an OIDC provider named `showcase-main` with issuer `https://gitlab.com` and allowed audience `https://gitlab.com`.
-3. Map `google.subject=assertion.sub,attribute.project_id=assertion.project_id,attribute.ref_path=assertion.ref_path` and set this provider condition:
+```sh
+bash scripts/setup-cloud-run-gcp.sh
+```
 
-   ```text
-   assertion.project_id == '87290826' && assertion.ref_path == 'refs/heads/main'
-   ```
+The script enables the required APIs, creates or checks the `gitlab` workload identity pool and `showcase-main` provider, creates separate deploy/runtime service accounts, adds the source-deploy and Cloud Build roles, and creates these **protected** GitLab variables:
 
-   This restricts federation to the Showcase project and its `main` branch. Also protect the GitLab `cloud-run-demo` environment and the default branch.
-4. Create a runtime service account with no project roles. Create a deploy service account, grant it `roles/run.sourceDeveloper` and `roles/serviceusage.serviceUsageConsumer` on the project, and grant `roles/iam.serviceAccountUser` on the runtime service account only.
-5. Grant the provider identity `roles/iam.workloadIdentityUser` on the deploy service account. Use the pool principal set restricted to `attribute.project_id/87290826`.
-6. Grant `roles/run.builder` to the Cloud Build service account used for source deployment. Confirm which build service account the project uses before assigning the role.
-7. Add these **protected** GitLab CI/CD variables (they are identifiers, not secrets):
+- `GCP_PROJECT_ID` = `vigia-497422`
+- `GCP_PROJECT_NUMBER` = `1028999311218`
+- `GCP_WIF_POOL_ID` = `gitlab`
+- `GCP_WIF_PROVIDER_ID` = `showcase-main`
+- `GCP_DEPLOYER_SERVICE_ACCOUNT` = `tbaf-gitlab-deployer@vigia-497422.iam.gserviceaccount.com`
+- `GCP_RUNTIME_SERVICE_ACCOUNT` = `tbaf-review-explorer-runtime@vigia-497422.iam.gserviceaccount.com`
+- `GCP_REGION` = `us-central1`
 
-   - `GCP_PROJECT_ID` = `vigia-497422`
-   - `GCP_PROJECT_NUMBER` = the numeric project number
-   - `GCP_WIF_POOL_ID` = `gitlab`
-   - `GCP_WIF_PROVIDER_ID` = `showcase-main`
-   - `GCP_DEPLOYER_SERVICE_ACCOUNT` = deploy account email
-   - `GCP_RUNTIME_SERVICE_ACCOUNT` = runtime account email
-   - `GCP_REGION` = `us-central1`
+The provider maps `google.subject=assertion.sub,attribute.project_id=assertion.project_id,attribute.ref_path=assertion.ref_path` and restricts identity tokens to this GitLab project and its protected `main` branch:
+
+```text
+assertion.project_id == '87290826' && assertion.ref_path == 'refs/heads/main'
+```
+
+Protect the GitLab `cloud-run-demo` environment and the default branch before deploying. The project and provider IDs are public identifiers; GitLab API credentials are not written to files or included in command arguments by the script.
 
 The job exchanges a GitLab ID token for short-lived Google credentials, builds from the repository's `Dockerfile`, and deploys the static image as a **private** service. It runs manually from protected `main` after the verify stage passes and records the deployed source SHA, Cloud Run revision, and service URL in a dotenv artifact. It deliberately does not change the service's IAM policy.
 
