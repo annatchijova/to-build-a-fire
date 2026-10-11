@@ -30,7 +30,7 @@
         <div class="loader-copy">
           <p class="eyebrow">LOCAL VIEWER</p>
           <h2 id="load-title">Choose a package</h2>
-          <p>Accepts <code>tbaf.review-package/v2</code> JSON up to 2 MB.</p>
+          <p>Accepts <code>tbaf.review-package/v2</code> and linked v2 JSON up to 2 MB.</p>
         </div>
         <div class="loader-actions">
           <input id="package-file" type="file" accept="application/json,.json" aria-describedby="file-help">
@@ -44,7 +44,7 @@
       <section id="empty-state" class="empty-state" aria-labelledby="empty-title">
         <span class="empty-icon" aria-hidden="true">↳</span>
         <h2 id="empty-title">Your review receipt will appear here</h2>
-        <p>Start with the example package, or choose <strong>Open JSON file</strong> to inspect a CI artifact.</p>
+        <p>Start with the example package, or choose <strong>Open JSON file</strong> to inspect a CI package or linked assessment.</p>
       </section>
 
       <section id="package-view" class="package-view" hidden aria-label="Review Package contents">
@@ -92,6 +92,7 @@
           <a href="#checks-section">Evidence</a>
           <a href="#tasks-section">Review tasks</a>
           <a href="#observations-section">Candidate observations</a>
+          <a id="mapper-nav" href="#mapper-section" hidden>Mapper context</a>
           <a href="#package-integrity">Package integrity</a>
         </nav>
 
@@ -127,6 +128,17 @@
             </div>
             <p class="subtle">Candidates describe what an agent or tool reported. They are not conclusions.</p>
             <div id="observations-list" class="stack-list"></div>
+          </article>
+
+          <article id="mapper-section" class="panel detail-card mapper-card" hidden>
+            <div class="section-heading">
+              <div><p class="eyebrow">DUO CHANGE MAPPER</p><h2>What the agent could inspect</h2></div>
+              <span id="mapper-coverage" class="state-pill"></span>
+            </div>
+            <p id="mapper-assurance" class="subtle"></p>
+            <div id="mapper-limitations" class="stack-list"></div>
+            <h3 class="mapper-subheading">Candidate observations</h3>
+            <div id="mapper-observations" class="stack-list"></div>
           </article>
         </section>
 

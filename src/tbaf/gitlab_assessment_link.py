@@ -172,7 +172,7 @@ def link_latest_assessment(
     if not candidates:
         reason = "no_internal_mapper_note" if mapper_notes == 0 else "no_valid_assessment_for_package_head"
         return ({
-            "schema_version": "tbaf.assessment-link-status/v1",
+            "schema_version": "tbaf.assessment-link-status/v2",
             "status": "not_found",
             "project": change.get("project"),
             "mr_iid": change.get("mr_iid"),
@@ -183,13 +183,14 @@ def link_latest_assessment(
 
     _, _, linked = max(candidates, key=lambda item: (item[0], item[1]))
     return ({
-        "schema_version": "tbaf.assessment-link-status/v1",
+        "schema_version": "tbaf.assessment-link-status/v2",
         "status": "linked",
         "project": change.get("project"),
         "mr_iid": change.get("mr_iid"),
         "head_sha": change.get("head_sha"),
         "mapper_notes_seen": mapper_notes,
         "candidate_observation_count": len(linked["change_mapper"]["observations"]),
+        "diff_coverage_status": linked["change_mapper"]["diff_coverage"]["status"],
         "gitlab_note_id": linked["change_mapper"]["gitlab_note"]["note_id"],
     }, linked)
 
@@ -236,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
         status, linked = link_latest_assessment(package_data, notes, config)
     except (OSError, ContractError, ValueError) as exc:
         status = {
-            "schema_version": "tbaf.assessment-link-status/v1",
+            "schema_version": "tbaf.assessment-link-status/v2",
             "status": "unavailable",
             "reason": str(exc),
         }

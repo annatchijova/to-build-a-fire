@@ -145,7 +145,7 @@ El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evide
 
 ## Explorador de Review Packages
 
-La interfaz del navegador muestra la ruta de atención, claims sin resolver, verificaciones, tareas humanas y observaciones candidatas de un Review Package. Elegí un artefacto de CI desde tu dispositivo: JavaScript lo lee localmente y nunca lo sube. El ejemplo incluido es ilustrativo; la interfaz muestra el digest SHA-256, pero no lo verifica.
+La interfaz del navegador muestra la ruta de atención, claims sin resolver, verificaciones, tareas humanas y observaciones candidatas de un Review Package. También acepta un sobre enlazado v2 y muestra las notas candidatas de Duo y su completitud declarada junto a la ruta determinística. Esa completitud sigue sin verificarse y no puede cambiar la ruta. Elegí un artefacto de CI desde tu dispositivo: JavaScript lo lee localmente y nunca lo sube. El ejemplo incluido es ilustrativo; la interfaz muestra el digest SHA-256, pero no lo verifica.
 
 Para ejecutarla desde la raíz del repositorio:
 

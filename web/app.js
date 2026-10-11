@@ -10,6 +10,8 @@ const elements = {
   empty: document.querySelector("#empty-state"),
   view: document.querySelector("#package-view"),
   exampleNotice: document.querySelector("#example-notice"),
+  mapperNav: document.querySelector("#mapper-nav"),
+  mapperSection: document.querySelector("#mapper-section"),
 };
 
 function node(tag, className, text) {
@@ -66,7 +68,69 @@ function renderList(target, rows, emptyText, renderRow) {
   for (const row of rows) target.append(renderRow(row));
 }
 
-function renderPackage(packageData, isExample) {
+function validateLinkedEnvelope(value) {
+  if (!isObject(value) || value.schema_version !== "tbaf.review-package-link/v2"
+      || !isObject(value.change_mapper) || !isObject(value.review_package)) {
+    throw new Error("This is not a supported linked Review Package v2 document.");
+  }
+  const mapper = value.change_mapper;
+  const coverage = mapper.diff_coverage;
+  if (mapper.epistemic_status !== "CANDIDATE" || !Array.isArray(mapper.observations)
+      || mapper.observations.length > MAX_ROWS_PER_SECTION || !isObject(coverage)
+      || !["complete", "partial", "unknown"].includes(coverage.status)
+      || !Array.isArray(coverage.paths) || coverage.paths.length > 2000
+      || coverage.paths.some((path) => typeof path !== "string" || path.length > MAX_PATH_CHARS)
+      || !Array.isArray(coverage.limitations) || coverage.limitations.length > 100
+      || coverage.limitations.some((item) => typeof item !== "string" || item.length > 1000)
+      || mapper.observations.some((item) => !isObject(item)
+        || typeof item.text !== "string" || item.text.length > 20_000)) {
+    throw new Error("The linked assessment is missing valid candidate or diff coverage metadata.");
+  }
+  return { packageData: validatePackage(value.review_package), mapper };
+}
+
+function renderMapper(mapper) {
+  elements.mapperSection.hidden = !mapper;
+  elements.mapperNav.hidden = !mapper;
+  if (!mapper) return;
+
+  const coverage = mapper.diff_coverage;
+  const pill = document.querySelector("#mapper-coverage");
+  pill.textContent = coverage.assertion_source === "reported_by_agent_not_independently_verified"
+    ? `reported ${coverage.status}`
+    : "unknown · legacy";
+  pill.className = `state-pill coverage-${coverage.status}`;
+  document.querySelector("#mapper-assurance").textContent =
+    coverage.assertion_source === "reported_by_agent_not_independently_verified"
+      ? "The agent reports this coverage state. The linker binds it to the exact MR head, but does not verify the claim. It never changes the deterministic route."
+      : "This legacy assessment has no structured coverage field. Coverage is unknown; absence of a warning is not evidence of a complete diff.";
+
+  const limitations = document.querySelector("#mapper-limitations");
+  limitations.replaceChildren();
+  const rows = [
+    ...coverage.limitations.map((item) => `Limitation: ${item}`),
+    ...coverage.paths.map((path) => `Affected path: ${path}`),
+  ];
+  if (!rows.length) rows.push("No coverage limitations reported by the mapper.");
+  for (const row of rows) limitations.append(node("p", "item-meta coverage-detail", row));
+
+  renderList(document.querySelector("#mapper-observations"), mapper.observations,
+    "No candidate observations were supplied.", (observation) => {
+      const card = node("section", "item-card");
+      const top = node("div", "item-topline");
+      top.append(node("h3", "item-title", observation.id || "Candidate"));
+      top.append(node("span", "candidate-pill", "CANDIDATE"));
+      card.append(top, node("p", "item-text", observation.text || "No observation text supplied."));
+      const locations = Array.isArray(observation.locations) ? observation.locations : [];
+      if (locations.length) {
+        card.append(node("p", "item-meta", locations.map((location) =>
+          `${location.path}:${location.start_line}-${location.end_line}`).join(" · ")));
+      }
+      return card;
+    });
+}
+
+function renderPackage(packageData, isExample, mapper = null) {
   const change = packageData.change;
   const attention = packageData.attention;
   const route = attention.route;
@@ -149,6 +213,7 @@ function renderPackage(packageData, isExample) {
   });
 
   document.querySelector("#package-digest").textContent = packageData.sha256;
+  renderMapper(mapper);
   elements.exampleNotice.hidden = !isExample;
   elements.empty.hidden = true;
   elements.view.hidden = false;
@@ -163,7 +228,10 @@ async function loadText(text, isExample = false) {
   } catch {
     throw new Error("The file is not valid JSON. Check that you selected the Review Package artifact.");
   }
-  renderPackage(validatePackage(parsed), isExample);
+  const documentData = parsed?.schema_version === "tbaf.review-package-link/v2"
+    ? validateLinkedEnvelope(parsed)
+    : { packageData: validatePackage(parsed), mapper: null };
+  renderPackage(documentData.packageData, isExample, documentData.mapper);
 }
 
 elements.file.addEventListener("change", async () => {

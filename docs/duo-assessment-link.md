@@ -1,8 +1,10 @@
 # Linking a Duo assessment to a Review Package
 
-`tbaf-link-assessment` creates a `tbaf.review-package-link/v1` envelope from a
+`tbaf-link-assessment` creates a `tbaf.review-package-link/v2` envelope from a
 deterministic `tbaf.review-package/v2` artifact and a structured
-`tbaf.duo-assessment/v1` candidate assessment. The input can be a JSON file or
+`tbaf.duo-assessment/v2` candidate assessment. It also accepts v1 assessments
+for compatibility and maps their missing completeness metadata to `unknown`.
+The input can be a JSON file or
 a human-readable note containing exactly one fenced `json` block. It rejects a
 mismatch in project, merge-request IID, or head SHA. Candidate locations must
 belong to paths changed by the MR, and each observation revision must equal the
@@ -16,6 +18,14 @@ in the envelope; the Change Mapper does not claim to have inspected that
 policy. The envelope's SHA-256 detects changes relative to the supplied files,
 but does not establish who created them. Verify the GitLab project, pipeline,
 job, and commit when obtaining the package artifact.
+
+The v2 envelope carries `change_mapper.diff_coverage` with `complete`, `partial`,
+or `unknown`, affected paths, and limitations. For v2 this is explicitly marked
+as agent-reported and not independently verified. It is display metadata only:
+it cannot lower or replace the deterministic route. Legacy v1 assessments map
+to `unknown`; missing metadata never means complete. The linker checks that
+listed paths belong to the package's changed paths and that incomplete states
+include a limitation, but cannot prove the mapper's statement is true.
 
 The checked-in flow YAML requests a human-readable assessment plus exactly one
 structured JSON block. The active GitLab UI flow is a separate object and must
@@ -70,7 +80,7 @@ using the candidate observations.
 
 ```json
 {
-  "schema_version": "tbaf.duo-assessment/v1",
+  "schema_version": "tbaf.duo-assessment/v2",
   "change": {
     "project": "group/project",
     "mr_iid": 2,
@@ -80,9 +90,21 @@ using the candidate observations.
     "agent": "inspect_mr",
     "version": "1"
   },
+  "diff_coverage": {
+    "status": "unknown",
+    "paths": [],
+    "limitations": ["The tool response did not establish complete patch coverage"]
+  },
   "observations": []
 }
 ```
+
+Use `complete` only when the supplied response establishes that the changed-file
+list and every patch are complete. Use `partial` when a file is marked collapsed
+or too large, or a patch is visibly truncated; list the affected changed paths.
+Use `unknown` when completeness cannot be established. `partial` and `unknown`
+require at least one limitation; `complete` requires empty `paths` and
+`limitations` arrays.
 
 The note can include human-readable context outside the single JSON block. Each
 observation uses the existing `tbaf.review-input/v1` observation shape,

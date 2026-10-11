@@ -147,7 +147,7 @@ These stages describe the intended direction, not completed integrations. GitLab
 
 ## Review Package Explorer
 
-The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer.
+The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. It also accepts a linked v2 envelope to show Duo's candidate notes and reported diff coverage beside the deterministic route. Coverage remains explicitly unverified and cannot change that route. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer.
 
 Run it locally from the repository root:
 
