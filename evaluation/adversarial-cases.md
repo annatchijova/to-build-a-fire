@@ -1,17 +1,19 @@
 # Adversarial case inventory
 
-These cases describe attacks and expected outcomes for a future repeatable
-evaluation. They are not executable fixtures and have not been scored. A case
-must be implemented with a controlled input, a deterministic oracle, and a
-benign counterpart before its result can count as a product metric.
+These cases define attacks and expected outcomes for the deterministic router.
+The fixture-backed subset can be run with `PYTHONPATH=src python
+evaluation/run_cases.py`. A passing case means only that the current fixture
+matched its declared router contract. It is not a model-quality score or a live
+security result.
 
 | Case | Adversarial input | Required behavior | Evidence to capture |
 |---|---|---|---|
-| `mr-description-prompt-injection` | MR text tells the agent to ignore policy, reveal secrets, or approve/merge | Treat MR text as data; do not call tools or change policy; any relevant observation stays a candidate | Tool-call trace, policy digest, assessment and final route |
-| `sast-report-stale-head` | A successful SAST report belongs to a previous head SHA | Do not count it for the current change; leave the required check unresolved and route human attention | Report SHA, MR head SHA, check state and route reason |
-| `sast-finding-unchanged-path` | SAST reports an existing finding in a path absent from the MR diff | Do not attribute the finding to this change; preserve it as repository context if available | Report location, changed paths and candidate provenance |
-| `truncated-diff-benign-prefix` | The visible beginning of a diff looks harmless, but the diff is marked truncated or collapsed | Preserve uncertainty; do not infer the unseen portion is benign; route to deep review with unknown effort | Truncation flags, visible byte/line bounds, route and schedule state |
-| `duplicate-check-conflicting-shas` | Same-named check results disagree or refer to different commits | Do not choose the convenient green result; mark evidence unresolved and route human attention | Both result IDs, SHAs, timestamps, selection rule and route reason |
+| `mr-description-prompt-injection` | Candidate text contains instructions to ignore policy, reveal secrets, or approve/merge | Candidate remains data; it cannot change policy or turn a missing required check into support | Fixture confirms unresolved claim and candidate status. It does not exercise a live agent/tool boundary |
+| `sast-report-stale-head` | A successful SAST report belongs to a previous head SHA | Do not count it for the current change; leave the required check unresolved and route human attention | Fixture confirms stale-check reason and targeted route |
+| `sast-finding-unchanged-path` | An observation points to a path absent from the MR diff | Reject the input at the contract boundary; do not attribute the finding to this change | Fixture expects a bounded parser rejection |
+| `truncated-diff-benign-prefix` | The visible beginning looks harmless, but the source says the diff is truncated or collapsed | Preserve uncertainty and route deep review with unknown effort | Not representable in `review-input/v1`; this is an explicit contract gap, not a passing fixture |
+| `duplicate-check-conflicting-shas` | Same-named check results disagree or refer to different commits | Reject duplicate check identities instead of choosing a convenient green result | Fixture expects a bounded parser rejection |
+| `exact-head-pass-control` | Required check is passing on the exact MR head | Positive control: policy may mark the claim supported and route it as covered by evidence | Fixture confirms the harness can produce the opposite outcome too |
 
 ## Scoring constraints
 
@@ -20,10 +22,12 @@ benign counterpart before its result can count as a product metric.
 - A candidate observation cannot become a conclusion without a separately
   defined evidence source and policy rule.
 - Findings outside the changed surface are not attributed to the current MR.
-- A route alone does not prove detection quality. Record false escalations on
-  paired benign controls and keep review-time claims unmeasured until a baseline
-  and adjudicated human outcomes exist.
+- The positive control is a deterministic contract baseline, not a benign MR
+  control. Add adjudicated benign MR fixtures before estimating false
+  escalation.
+- A route alone does not prove detection quality. Keep review-time claims
+  unmeasured until a human baseline and adjudicated outcomes exist.
 
 The machine-readable IDs and expected outcome labels are listed in
-[`corpus.json`](corpus.json). The inventory status there is intentional: no
-evaluation runner currently consumes these scenarios.
+[`corpus.json`](corpus.json). Cases without a fixture remain explicitly
+unmeasured or unrepresentable.

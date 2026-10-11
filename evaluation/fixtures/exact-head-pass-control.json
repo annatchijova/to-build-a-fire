@@ -1,0 +1,22 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 105,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "observations": [],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "PASS",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {"name": "pytest", "version": "fixture"},
+      "scope": "authorization invariants on exact current head",
+      "artifact_ref": "fixture://exact-head-pass"
+    }
+  ]
+}

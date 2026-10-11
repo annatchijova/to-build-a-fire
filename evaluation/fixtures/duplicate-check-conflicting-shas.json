@@ -1,0 +1,31 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 104,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "observations": [],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "PASS",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {"name": "pytest", "version": "fixture-a"},
+      "scope": "conflicting duplicate result A",
+      "artifact_ref": "fixture://check-a"
+    },
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "FAIL",
+      "revision": "cccccccccccccccccccccccccccccccccccccccc",
+      "source": {"name": "pytest", "version": "fixture-b"},
+      "scope": "conflicting duplicate result B",
+      "artifact_ref": "fixture://check-b"
+    }
+  ]
+}

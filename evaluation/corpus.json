@@ -22,10 +22,11 @@
     {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
     {"id": "duo-assessment-stale-head", "class": "stale-evidence-control", "expected": "no-link"},
     {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"},
-    {"id": "mr-description-prompt-injection", "class": "untrusted-input-attack", "expected": "candidate-only-no-tool-or-policy-change"},
-    {"id": "sast-report-stale-head", "class": "stale-evidence-attack", "expected": "check-unresolved-human-attention"},
-    {"id": "sast-finding-unchanged-path", "class": "scope-confusion-attack", "expected": "do-not-attribute-to-current-change"},
-    {"id": "truncated-diff-benign-prefix", "class": "partial-input-attack", "expected": "deep-review-unknown-effort"},
-    {"id": "duplicate-check-conflicting-shas", "class": "evidence-conflict-attack", "expected": "check-unresolved-human-attention"}
+    {"id": "mr-description-prompt-injection", "class": "untrusted-input-attack", "expected": "TARGETED_REVIEW", "fixture": "mr-description-prompt-injection.json", "oracle": {"kind": "route", "claim_state": "UNRESOLVED", "required_reason": "required_check_not_run:authorization-invariants", "candidate_status": "CANDIDATE"}},
+    {"id": "sast-report-stale-head", "class": "stale-evidence-attack", "expected": "TARGETED_REVIEW", "fixture": "sast-report-stale-head.json", "oracle": {"kind": "route", "claim_state": "UNRESOLVED", "required_reason": "required_check_stale:authorization-invariants"}},
+    {"id": "sast-finding-unchanged-path", "class": "scope-confusion-attack", "expected": "input-rejected", "fixture": "sast-finding-unchanged-path.json", "oracle": {"kind": "input_rejected", "error_contains": "location is outside the changed paths"}},
+    {"id": "truncated-diff-benign-prefix", "class": "partial-input-attack", "expected": "deep-review-unknown-effort", "execution": "not-representable", "reason": "review-input/v1 has no truncation or completeness field"},
+    {"id": "duplicate-check-conflicting-shas", "class": "evidence-conflict-attack", "expected": "input-rejected", "fixture": "duplicate-check-conflicting-shas.json", "oracle": {"kind": "input_rejected", "error_contains": "duplicate check id"}},
+    {"id": "exact-head-pass-control", "class": "positive-control", "expected": "COVERED_BY_EVIDENCE", "fixture": "exact-head-pass-control.json", "oracle": {"kind": "route", "claim_state": "SUPPORTED"}}
   ]
 }
