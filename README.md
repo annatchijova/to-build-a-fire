@@ -147,15 +147,15 @@ These stages describe the intended direction, not completed integrations. GitLab
 
 ## Review Package Explorer
 
-The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. It also accepts a linked v2 envelope to show Duo's candidate notes and reported diff coverage beside the deterministic route. Coverage remains explicitly unverified and cannot change that route. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer.
+The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. It also accepts a linked v2 envelope to show Duo's candidate notes and reported diff coverage beside the deterministic route. Coverage remains explicitly unverified and cannot change that route. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer. The interface offers English and Spanish plus light and dark themes, and remembers each choice on the device. Agent-written evidence stays in its original language.
 
 Run it locally from the repository root:
 
 ```sh
-python3 -m http.server 8080 --directory web
+python3 -m http.server 18765 --directory web
 ```
 
-Open `http://localhost:8080`. A non-root NGINX container and a protected, manual GitLab OIDC deploy job for Cloud Run are also prepared. Google IAM/WIF is configured; first deployment is waiting for a Maintainer or Owner to protect the `cloud-run-demo` environment. The hosted URL and monitoring are not live yet; see [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
+Open `http://localhost:18765`. A non-root NGINX container and a protected, manual GitLab OIDC deploy job for Cloud Run are also prepared. Google IAM/WIF is configured; first deployment is waiting for a Maintainer or Owner to protect the `cloud-run-demo` environment. The hosted URL and monitoring are not live yet; see [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
 
 ## Repository map
 
