@@ -2,7 +2,8 @@
 
 These cases define attacks and expected outcomes for the deterministic router.
 The fixture-backed subset can be run with `PYTHONPATH=src python3
-evaluation/run_cases.py`. The runner distinguishes route matches, expected
+evaluation/run_cases.py` and is wired to the `adversarial-router-cases` GitLab
+CI job. The runner distinguishes route matches, expected
 input rejections, positive-control matches, discrepancies, and cases it cannot
 evaluate. These outcomes are not a model-quality score or a live security
 result.
