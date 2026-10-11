@@ -143,6 +143,18 @@ flowchart LR
 
 El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evidencia observable. La [matriz Path B / Assisted](docs/hackathon-path-b.md#nine-stage-coverage-contract) define qué prueba necesita cada etapa; todavía no afirma que las integraciones estén ejecutándose.
 
+## Explorador de Review Packages
+
+La interfaz del navegador muestra la ruta de atención, claims sin resolver, verificaciones, tareas humanas y observaciones candidatas de un Review Package. Elegí un artefacto de CI desde tu dispositivo: JavaScript lo lee localmente y nunca lo sube. El ejemplo incluido es ilustrativo; la interfaz muestra el digest SHA-256, pero no lo verifica.
+
+Para ejecutarla desde la raíz del repositorio:
+
+```sh
+python3 -m http.server 8080 --directory web
+```
+
+Abrí `http://localhost:8080`. También están preparados un contenedor NGINX sin privilegios y un job manual de GitLab con OIDC para Cloud Run, limitado a `main` protegida. El primer deploy requiere configurar la identidad y los permisos de Google según [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md); la URL y el monitoreo todavía no están activos.
+
 ## Mapa del repositorio
 
 - `README.md` — descripción del proyecto y comportamiento esperado.
@@ -152,6 +164,9 @@ El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evide
 - `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
 - `.gitlab/duo/flows/attention-review.yml` — configuración versionada del flow de mapeo de MR. El flow activo del proyecto es otro objeto en GitLab; hay que mantenerlo sincronizado antes de depender de su evaluación JSON estructurada.
 - `.gitlab-ci.yml` — SAST de GitLab en pipelines de MR, contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Los hallazgos del scanner todavía no se incorporan al Review Package; estos jobs no habilitan merge ni despliegue.
+- `web/` — interfaz local-first para explorar Review Packages y un ejemplo ilustrativo.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run; falta configurar OIDC/IAM.
+- `docs/adr/` — decisiones de arquitectura y sus supuestos.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.
 - `docs/red-team/` — revisiones adversariales de diseño y su evidencia.
