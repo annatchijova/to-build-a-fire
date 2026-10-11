@@ -1,6 +1,6 @@
 {
   "schema_version": "tbaf.mutation-corpus/v1",
-  "status": "inventory; linker controls are enforced by tests/test_gitlab_assessment_link.py; live rates are unmeasured",
+  "status": "scenario inventory; not an executable evaluation harness; linker controls are enforced by tests/test_gitlab_assessment_link.py; live rates are unmeasured",
   "oracle": {
     "critical_unresolved_must_not_be_covered": true,
     "candidate_observations_are_not_conclusions": true,
@@ -21,6 +21,11 @@
     {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
     {"id": "duo-assessment-stale-head", "class": "stale-evidence-control", "expected": "no-link"},
-    {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"}
+    {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"},
+    {"id": "mr-description-prompt-injection", "class": "untrusted-input-attack", "expected": "candidate-only-no-tool-or-policy-change"},
+    {"id": "sast-report-stale-head", "class": "stale-evidence-attack", "expected": "check-unresolved-human-attention"},
+    {"id": "sast-finding-unchanged-path", "class": "scope-confusion-attack", "expected": "do-not-attribute-to-current-change"},
+    {"id": "truncated-diff-benign-prefix", "class": "partial-input-attack", "expected": "deep-review-unknown-effort"},
+    {"id": "duplicate-check-conflicting-shas", "class": "evidence-conflict-attack", "expected": "check-unresolved-human-attention"}
   ]
 }
