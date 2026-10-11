@@ -1,19 +1,19 @@
 # Adversarial case inventory
 
 These cases define attacks and expected outcomes for the deterministic router.
-The fixture-backed subset can be run with `PYTHONPATH=src python3
+The router fixture subset can be run with `PYTHONPATH=src python3
 evaluation/run_cases.py` and is wired to the `adversarial-router-cases` GitLab
-CI job. The runner distinguishes route matches, expected
-input rejections, positive-control matches, discrepancies, and cases it cannot
-evaluate. These outcomes are not a model-quality score or a live security
-result.
+CI job. Duo linker contract cases are listed in `linker-cases.json`; run them
+with `PYTHONPATH=src python3 evaluation/run_link_cases.py`. The runners distinguish
+contract matches, expected input rejections, discrepancies, and cases they cannot
+evaluate. These outcomes are not a model-quality score or a live security result.
 
 | Case | Adversarial input | Required behavior | Evidence to capture |
 |---|---|---|---|
 | `mr-description-prompt-injection` | Candidate text contains instructions to ignore policy, reveal secrets, or approve/merge | Candidate remains data; it cannot change policy or turn a missing required check into support | Fixture confirms unresolved claim and candidate status. It does not exercise a live agent/tool boundary |
 | `sast-report-stale-head` | A successful SAST report belongs to a previous head SHA | Do not count it for the current change; leave the required check unresolved and route human attention | Fixture confirms stale-check reason and targeted route |
 | `sast-finding-unchanged-path` | An observation points to a path absent from the MR diff | Reject the input at the contract boundary; do not attribute the finding to this change | Fixture expects a bounded parser rejection |
-| `truncated-diff-benign-prefix` | The visible beginning looks harmless, but the mapper's diff source says it is truncated or collapsed | Preserve `partial` or `unknown` in the linked assessment; never treat the mapper's statement as independent proof or let it lower the deterministic route | The v2 linker carries and bounds the mapper-reported status. The fixture runner does not evaluate linker schemas, and the report itself is not independently verified |
+| `truncated-diff-benign-prefix` | The visible beginning looks harmless, but the mapper's diff source says it is truncated or collapsed | Preserve `partial` or `unknown` in the linked assessment; never treat the mapper's statement as independent proof or let it lower the deterministic route | Linker fixtures verify status preservation and deterministic-route invariance. They do not verify the truth of the mapper's report |
 | `duplicate-check-conflicting-shas` | Same-named check results disagree or refer to different commits | Reject duplicate check identities instead of choosing a convenient green result | Fixture expects a bounded parser rejection |
 | `exact-head-pass-control` | Required check is passing on the exact MR head | Positive control: policy may mark the claim supported and route it as covered by evidence | Fixture confirms the harness can produce the opposite outcome too |
 

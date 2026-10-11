@@ -1,6 +1,6 @@
 {
   "schema_version": "tbaf.mutation-corpus/v1",
-  "status": "scenario inventory; not an executable evaluation harness; linker controls are enforced by tests/test_gitlab_assessment_link.py; live rates are unmeasured",
+  "status": "scenario inventory; router and linker contract fixtures run in separate CI jobs; live detection rates are unmeasured",
   "oracle": {
     "critical_unresolved_must_not_be_covered": true,
     "candidate_observations_are_not_conclusions": true,

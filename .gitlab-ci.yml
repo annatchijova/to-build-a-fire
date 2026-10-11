@@ -46,6 +46,16 @@ adversarial-router-cases:
   script:
     - PYTHONPATH=src python evaluation/run_cases.py
 
+# Validate the versioned Duo assessment/link contract without calling GitLab or
+# trusting the mapper's reported coverage as ground truth.
+assessment-link-contract-cases:
+  stage: verify
+  image: python:3.12-slim
+  variables:
+    PYTHONDONTWRITEBYTECODE: "1"
+  script:
+    - PYTHONPATH=src python evaluation/run_link_cases.py
+
 # This job exercises the deterministic router in GitLab CI and publishes its
 # receipt. The input uses illustrative SHAs and is not evidence about this
 # pipeline's own merge request; MR-bound capture and checks remain future work.

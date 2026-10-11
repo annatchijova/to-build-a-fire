@@ -1,0 +1,11 @@
+{
+  "schema_version": "tbaf.duo-assessment/v2",
+  "change": {"project": "example/service", "mr_iid": 82, "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+  "source": {"agent": "inspect_mr", "version": "1"},
+  "diff_coverage": {
+    "status": "partial",
+    "paths": ["src/auth.py"],
+    "limitations": ["GitLab marked this file patch as too_large"]
+  },
+  "observations": []
+}
