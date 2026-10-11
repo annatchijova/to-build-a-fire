@@ -46,11 +46,14 @@ def evaluate(corpus_path: Path, policy_path: Path) -> list[dict[str, str]]:
         except ContractError as exc:
             expected = oracle.get("kind") == "input_rejected"
             matched = expected and oracle.get("error_contains", "") in str(exc)
-            results.append({"id": scenario["id"], "status": "PASS" if matched else "FAIL"})
+            results.append({
+                "id": scenario["id"],
+                "status": "EXPECTED_REJECTION" if matched else "DISCREPANCY",
+            })
             continue
 
         if oracle.get("kind") == "input_rejected":
-            results.append({"id": scenario["id"], "status": "FAIL"})
+            results.append({"id": scenario["id"], "status": "DISCREPANCY"})
             continue
 
         artifact = build_artifact(parsed)
@@ -64,7 +67,8 @@ def evaluate(corpus_path: Path, policy_path: Path) -> list[dict[str, str]]:
             checks.append(oracle["required_reason"] in claim["reasons"])
         if oracle.get("candidate_status"):
             checks.append(all(item["epistemic_status"] == oracle["candidate_status"] for item in parsed["observations"]))
-        results.append({"id": scenario["id"], "status": "PASS" if all(checks) else "FAIL"})
+        status = "CONTROL_MATCHED" if scenario["class"] == "positive-control" else "ROUTE_MATCHED"
+        results.append({"id": scenario["id"], "status": status if all(checks) else "DISCREPANCY"})
 
     return results
 
@@ -82,10 +86,19 @@ def main() -> int:
 
     for result in results:
         print(f"{result['status']:13} {result['id']}")
-    failures = sum(result["status"] == "FAIL" for result in results)
-    print(f"\nCases: {len(results)}; failures: {failures}; not evaluable: {sum(r['status'] == 'NOT_EVALUABLE' for r in results)}")
-    print("Case counts are contract checks, not detection-quality or productivity metrics.")
-    return 1 if failures else 0
+    counts = {status: sum(result["status"] == status for result in results) for status in {
+        "ROUTE_MATCHED", "EXPECTED_REJECTION", "CONTROL_MATCHED", "DISCREPANCY", "NOT_EVALUABLE"
+    }}
+    print(
+        "\nFixture outcomes: "
+        f"route matches {counts['ROUTE_MATCHED']}; "
+        f"expected input rejections {counts['EXPECTED_REJECTION']}; "
+        f"control matches {counts['CONTROL_MATCHED']}; "
+        f"discrepancies {counts['DISCREPANCY']}; "
+        f"not evaluable {counts['NOT_EVALUABLE']}"
+    )
+    print("These are deterministic contract outcomes, not detection-quality or productivity metrics.")
+    return 1 if counts["DISCREPANCY"] else 0
 
 
 if __name__ == "__main__":

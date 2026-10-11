@@ -1,10 +1,11 @@
 # Adversarial case inventory
 
 These cases define attacks and expected outcomes for the deterministic router.
-The fixture-backed subset can be run with `PYTHONPATH=src python
-evaluation/run_cases.py`. A passing case means only that the current fixture
-matched its declared router contract. It is not a model-quality score or a live
-security result.
+The fixture-backed subset can be run with `PYTHONPATH=src python3
+evaluation/run_cases.py`. The runner distinguishes route matches, expected
+input rejections, positive-control matches, discrepancies, and cases it cannot
+evaluate. These outcomes are not a model-quality score or a live security
+result.
 
 | Case | Adversarial input | Required behavior | Evidence to capture |
 |---|---|---|---|
