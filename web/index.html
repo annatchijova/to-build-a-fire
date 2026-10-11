@@ -10,6 +10,7 @@
     <script src="/app.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="topbar">
       <a class="wordmark" href="/" aria-label="TO BUILD A FIRE home">
         <span class="fire-mark" aria-hidden="true">✳</span>
@@ -18,7 +19,7 @@
       <span class="topbar-label">Review Package Explorer</span>
     </header>
 
-    <main class="shell">
+    <main id="main-content" class="shell">
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">EVIDENCE IN. ATTENTION OUT.</p>
         <h1 id="page-title">See what still needs a human.</h1>
@@ -29,7 +30,7 @@
         <div class="loader-copy">
           <p class="eyebrow">LOCAL VIEWER</p>
           <h2 id="load-title">Choose a package</h2>
-          <p>Accepts <code>tbaf.review-package/v2</code> JSON up to 2 MB.</p>
+          <p>Accepts <code>tbaf.review-package/v2</code> and linked v2 JSON up to 2 MB.</p>
         </div>
         <div class="loader-actions">
           <input id="package-file" type="file" accept="application/json,.json" aria-describedby="file-help">
@@ -43,7 +44,7 @@
       <section id="empty-state" class="empty-state" aria-labelledby="empty-title">
         <span class="empty-icon" aria-hidden="true">↳</span>
         <h2 id="empty-title">Your review receipt will appear here</h2>
-        <p>Start with the example package, or choose <strong>Open JSON file</strong> to inspect a CI artifact.</p>
+        <p>Start with the example package, or choose <strong>Open JSON file</strong> to inspect a CI package or linked assessment.</p>
       </section>
 
       <section id="package-view" class="package-view" hidden aria-label="Review Package contents">
@@ -85,8 +86,18 @@
           </article>
         </section>
 
+        <nav class="package-nav" aria-label="Jump to package section">
+          <span>In this package</span>
+          <a href="#claims-section">Claims</a>
+          <a href="#checks-section">Evidence</a>
+          <a href="#tasks-section">Review tasks</a>
+          <a href="#observations-section">Candidate observations</a>
+          <a id="mapper-nav" href="#mapper-section" hidden>Mapper context</a>
+          <a href="#package-integrity">Package integrity</a>
+        </nav>
+
         <section class="detail-grid" aria-label="Evidence and review tasks">
-          <article class="panel detail-card">
+          <article id="claims-section" class="panel detail-card">
             <div class="section-heading">
               <div><p class="eyebrow">POLICY CLAIMS</p><h2>What remains unresolved</h2></div>
               <span id="claim-count" class="count"></span>
@@ -94,7 +105,7 @@
             <div id="claims-list" class="stack-list"></div>
           </article>
 
-          <article class="panel detail-card">
+          <article id="checks-section" class="panel detail-card">
             <div class="section-heading">
               <div><p class="eyebrow">VERIFICATION</p><h2>Evidence recorded</h2></div>
               <span id="check-count" class="count"></span>
@@ -102,7 +113,7 @@
             <div id="checks-list" class="stack-list"></div>
           </article>
 
-          <article class="panel detail-card task-card">
+          <article id="tasks-section" class="panel detail-card task-card">
             <div class="section-heading">
               <div><p class="eyebrow">HUMAN WORK</p><h2>Review tasks</h2></div>
               <span id="task-count" class="count"></span>
@@ -110,7 +121,7 @@
             <div id="tasks-list" class="stack-list"></div>
           </article>
 
-          <article class="panel detail-card observations-card">
+          <article id="observations-section" class="panel detail-card observations-card">
             <div class="section-heading">
               <div><p class="eyebrow">AGENT / TOOL OUTPUT</p><h2>Candidate observations</h2></div>
               <span id="observation-count" class="count"></span>
@@ -118,9 +129,20 @@
             <p class="subtle">Candidates describe what an agent or tool reported. They are not conclusions.</p>
             <div id="observations-list" class="stack-list"></div>
           </article>
+
+          <article id="mapper-section" class="panel detail-card mapper-card" hidden>
+            <div class="section-heading">
+              <div><p class="eyebrow">DUO CHANGE MAPPER</p><h2>What the agent could inspect</h2></div>
+              <span id="mapper-coverage" class="state-pill"></span>
+            </div>
+            <p id="mapper-assurance" class="subtle"></p>
+            <div id="mapper-limitations" class="stack-list"></div>
+            <h3 class="mapper-subheading">Candidate observations</h3>
+            <div id="mapper-observations" class="stack-list"></div>
+          </article>
         </section>
 
-        <footer class="package-footer">
+        <footer id="package-integrity" class="package-footer">
           <p>Package content digest <code id="package-digest"></code></p>
           <p>This viewer displays the package's digest but does not verify it. A digest is not a signature and does not identify who produced the package.</p>
         </footer>

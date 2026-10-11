@@ -1,0 +1,13 @@
+{
+  "schema_version": "tbaf.linker-cases/v1",
+  "purpose": "Deterministic schema and invariant checks for exact-head assessment linking; not mapper-quality metrics.",
+  "cases": [
+    {"id": "legacy-v1-defaults-to-unknown", "fixture": "assessment-v1-legacy.json", "expected": {"kind": "linked", "coverage": "unknown"}},
+    {"id": "v2-partial-preserved", "fixture": "assessment-v2-partial.json", "expected": {"kind": "linked", "coverage": "partial"}},
+    {"id": "v2-unknown-preserved", "fixture": "assessment-v2-unknown.json", "expected": {"kind": "linked", "coverage": "unknown"}},
+    {"id": "v2-complete-preserved", "fixture": "assessment-v2-complete.json", "expected": {"kind": "linked", "coverage": "complete"}},
+    {"id": "v2-missing-coverage-rejected", "fixture": "assessment-v2-missing-coverage.json", "expected": {"kind": "rejected", "error_contains": "diff_coverage"}},
+    {"id": "v2-contradictory-complete-rejected", "fixture": "assessment-v2-contradictory-complete.json", "expected": {"kind": "rejected", "error_contains": "complete diff_coverage"}},
+    {"id": "v2-unchanged-coverage-path-rejected", "fixture": "assessment-v2-unchanged-path.json", "expected": {"kind": "rejected", "error_contains": "unique changed path"}}
+  ]
+}

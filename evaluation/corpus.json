@@ -1,6 +1,6 @@
 {
   "schema_version": "tbaf.mutation-corpus/v1",
-  "status": "inventory; linker controls are enforced by tests/test_gitlab_assessment_link.py; live rates are unmeasured",
+  "status": "scenario inventory; router and linker contract fixtures run in separate CI jobs; live detection rates are unmeasured",
   "oracle": {
     "critical_unresolved_must_not_be_covered": true,
     "candidate_observations_are_not_conclusions": true,
@@ -21,6 +21,12 @@
     {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
     {"id": "duo-assessment-stale-head", "class": "stale-evidence-control", "expected": "no-link"},
-    {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"}
+    {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"},
+    {"id": "mr-description-prompt-injection", "class": "untrusted-input-attack", "expected": "TARGETED_REVIEW", "fixture": "mr-description-prompt-injection.json", "oracle": {"kind": "route", "claim_state": "UNRESOLVED", "required_reason": "required_check_not_run:authorization-invariants", "candidate_status": "CANDIDATE"}},
+    {"id": "sast-report-stale-head", "class": "stale-evidence-attack", "expected": "TARGETED_REVIEW", "fixture": "sast-report-stale-head.json", "oracle": {"kind": "route", "claim_state": "UNRESOLVED", "required_reason": "required_check_stale:authorization-invariants"}},
+    {"id": "sast-finding-unchanged-path", "class": "scope-confusion-attack", "expected": "input-rejected", "fixture": "sast-finding-unchanged-path.json", "oracle": {"kind": "input_rejected", "error_contains": "location is outside the changed paths"}},
+    {"id": "truncated-diff-benign-prefix", "class": "partial-input-attack", "expected": "link-as-partial-or-unknown-without-changing-deterministic-route", "execution": "not-evaluated-by-router-runner", "reason": "the v2 Duo assessment/link contract carries mapper-reported completeness metadata, but the router fixture runner does not evaluate linker schemas and the assertion is not independently verified"},
+    {"id": "duplicate-check-conflicting-shas", "class": "evidence-conflict-attack", "expected": "input-rejected", "fixture": "duplicate-check-conflicting-shas.json", "oracle": {"kind": "input_rejected", "error_contains": "duplicate check id"}},
+    {"id": "exact-head-pass-control", "class": "positive-control", "expected": "COVERED_BY_EVIDENCE", "fixture": "exact-head-pass-control.json", "oracle": {"kind": "route", "claim_state": "SUPPORTED"}}
   ]
 }

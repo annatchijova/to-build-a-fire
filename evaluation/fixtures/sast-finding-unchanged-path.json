@@ -1,0 +1,34 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 103,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "observations": [
+    {
+      "id": "unchanged-path-finding",
+      "kind": "impact_candidate",
+      "claim_id": "authorization-boundary",
+      "impact": "affected",
+      "source": {"agent": "semgrep-sast", "version": "fixture"},
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "scope": "finding location belongs to an unchanged file",
+      "text": "Existing finding reported outside the merge request diff.",
+      "locations": [{"path": "docs/security.md", "start_line": 12, "end_line": 12}]
+    }
+  ],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "NOT_RUN",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {"name": "pytest", "version": "fixture"},
+      "scope": "authorization invariants",
+      "artifact_ref": null
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 102,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "observations": [],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "PASS",
+      "revision": "cccccccccccccccccccccccccccccccccccccccc",
+      "source": {"name": "semgrep-sast", "version": "fixture"},
+      "scope": "stale successful report from a previous head SHA",
+      "artifact_ref": "fixture://stale-sast-report"
+    }
+  ]
+}
