@@ -1,0 +1,95 @@
+{
+  "attention": {
+    "capacity_minutes": 90,
+    "known_demand_minutes": 35,
+    "reasons": [
+      "required_check_not_run:authorization-invariants"
+    ],
+    "route": "TARGETED_REVIEW",
+    "schedule_state": "WITHIN_CAPACITY",
+    "scheduled_known_minutes": 35,
+    "scheduled_task_ids": [
+      "review:authorization-boundary"
+    ],
+    "tasks": [
+      {
+        "claim_id": "authorization-boundary",
+        "consequence": "critical",
+        "estimate_source": "Example team estimate; replace with repository policy",
+        "locations": [],
+        "reason_codes": [
+          "required_check_not_run:authorization-invariants"
+        ],
+        "required_minutes": 35,
+        "route": "TARGETED_REVIEW",
+        "task_id": "review:authorization-boundary"
+      }
+    ],
+    "uncovered_known_minutes": 0,
+    "uncovered_task_ids": [],
+    "unknown_demand_tasks": 0
+  },
+  "change": {
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "mr_iid": 82,
+    "paths": [
+      "src/auth.py"
+    ],
+    "project": "example/service"
+  },
+  "checks": [
+    {
+      "artifact_ref": null,
+      "claim_id": "authorization-boundary",
+      "id": "authorization-invariants",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "scope": "Authorization invariants; illustrative input only",
+      "source": {
+        "name": "pytest",
+        "version": "example"
+      },
+      "status": "NOT_RUN"
+    }
+  ],
+  "claims": [
+    {
+      "candidate_observation_ids": [],
+      "claim_id": "authorization-boundary",
+      "consequence": "critical",
+      "evidence_state": "UNRESOLVED",
+      "locations": [],
+      "reasons": [
+        "required_check_not_run:authorization-invariants"
+      ],
+      "required_checks": [
+        "authorization-invariants"
+      ]
+    }
+  ],
+  "observations": [],
+  "policy": {
+    "capacity_minutes": 90,
+    "claims": [
+      {
+        "attention_minutes": 35,
+        "consequence": "critical",
+        "estimate_source": "Example team estimate; replace with repository policy",
+        "id": "authorization-boundary",
+        "path_globs": [
+          "src/auth.py"
+        ],
+        "required_checks": [
+          "authorization-invariants"
+        ],
+        "review_route": "targeted",
+        "statement": "can_read_record denies unauthenticated users and authenticated non-owner non-admins, and permits authenticated owners or admins."
+      }
+    ],
+    "id": "service-review",
+    "sha256": "49cc222d887b249ceae3da8083407af4c918182cb0f74cabb3a46e3d635518e4",
+    "version": "1"
+  },
+  "schema_version": "tbaf.review-package/v2",
+  "sha256": "955b1369114af6edfe236d3122dc57f0b41005f248a09c9e3a0287143a63279a"
+}

@@ -145,6 +145,18 @@ flowchart LR
 
 These stages describe the intended direction, not completed integrations. GitLab Duo has been used for MR mapping and human-approved internal notes; the complete nine-stage workflow, including release, deployment, and monitoring, remains unfinished.
 
+## Review Package Explorer
+
+The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer.
+
+Run it locally from the repository root:
+
+```sh
+python3 -m http.server 8080 --directory web
+```
+
+Open `http://localhost:8080`. A non-root NGINX container and a protected, manual GitLab OIDC deploy job for Cloud Run are also prepared. First deployment still requires the Google identity/IAM setup in [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md); the hosted URL and monitoring are not live yet.
+
 ## Repository map
 
 - `README.md` — project overview and intended behavior.
@@ -154,6 +166,9 @@ These stages describe the intended direction, not completed integrations. GitLab
 - `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
 - `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Scanner findings are not yet ingested into the Review Package; these jobs do not gate merge or deployment.
+- `web/` — local-first Review Package Explorer and illustrative sample.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration; OIDC/IAM setup remains pending.
+- `docs/adr/` — architecture decisions and their assumptions.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.
 - `docs/red-team/` — adversarial design reviews and their evidence.

@@ -1,0 +1,8 @@
+# Source deploy only needs the static viewer, container recipe, and web config.
+**
+!Dockerfile
+!web/
+!web/**
+!deployment/
+!deployment/cloud-run/
+!deployment/cloud-run/nginx.conf

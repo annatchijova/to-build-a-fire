@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171715">
+    <meta name="description" content="Inspect a TO BUILD A FIRE Review Package in your browser. Your package stays on your device.">
+    <title>Review Package Explorer · TO BUILD A FIRE</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/" aria-label="TO BUILD A FIRE home">
+        <span class="fire-mark" aria-hidden="true">✳</span>
+        <span>TO BUILD A FIRE</span>
+      </a>
+      <span class="topbar-label">Review Package Explorer</span>
+    </header>
+
+    <main class="shell">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">EVIDENCE IN. ATTENTION OUT.</p>
+        <h1 id="page-title">See what still needs a human.</h1>
+        <p class="lede">Open a Review Package to inspect its route, evidence gaps, and review demand. The file is read in this browser and is never uploaded.</p>
+      </section>
+
+      <section class="loader panel" aria-labelledby="load-title">
+        <div class="loader-copy">
+          <p class="eyebrow">LOCAL VIEWER</p>
+          <h2 id="load-title">Choose a package</h2>
+          <p>Accepts <code>tbaf.review-package/v2</code> JSON up to 2 MB.</p>
+        </div>
+        <div class="loader-actions">
+          <input id="package-file" type="file" accept="application/json,.json" aria-describedby="file-help">
+          <label class="file-button" for="package-file">Open JSON file</label>
+          <button id="load-demo" class="button-secondary" type="button">Load example</button>
+          <span id="file-help" class="visually-hidden">Select a Review Package JSON file from this device.</span>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite">No package loaded. Open a file or load the example.</p>
+      </section>
+
+      <section id="empty-state" class="empty-state" aria-labelledby="empty-title">
+        <span class="empty-icon" aria-hidden="true">↳</span>
+        <h2 id="empty-title">Your review receipt will appear here</h2>
+        <p>Start with the example package, or choose <strong>Open JSON file</strong> to inspect a CI artifact.</p>
+      </section>
+
+      <section id="package-view" class="package-view" hidden aria-label="Review Package contents">
+        <div id="example-notice" class="example-notice" hidden>
+          Example data only. This is not a live merge request or a security verdict.
+        </div>
+
+        <section class="overview-grid" aria-label="Change and attention summary">
+          <article class="panel change-card">
+            <p class="eyebrow">CHANGE</p>
+            <h2 id="change-title">Merge request</h2>
+            <p id="change-project" class="project-name"></p>
+            <dl class="identity-list">
+              <div><dt>MR</dt><dd id="change-iid"></dd></div>
+              <div><dt>Head SHA</dt><dd id="change-sha" class="sha"></dd></div>
+              <div><dt>Changed paths</dt><dd id="change-path-count"></dd></div>
+              <div><dt>Policy</dt><dd id="policy-name"></dd></div>
+            </dl>
+            <ul id="changed-paths" class="path-list" aria-label="Changed paths"></ul>
+          </article>
+
+          <article class="panel route-card">
+            <div class="route-heading">
+              <div>
+                <p class="eyebrow">ATTENTION ROUTE</p>
+                <h2 id="route-title"></h2>
+              </div>
+              <span id="route-glyph" class="route-glyph" aria-hidden="true"></span>
+            </div>
+            <p id="route-description" class="route-description"></p>
+            <h3>Why this route</h3>
+            <ul id="route-reasons" class="reason-list"></ul>
+            <div class="capacity" aria-label="Review capacity and demand">
+              <div><span>Capacity</span><strong id="capacity-value"></strong></div>
+              <div><span>Known demand</span><strong id="demand-value"></strong></div>
+              <div><span>Still uncovered</span><strong id="uncovered-value"></strong></div>
+            </div>
+            <p id="schedule-state" class="schedule-state"></p>
+          </article>
+        </section>
+
+        <section class="detail-grid" aria-label="Evidence and review tasks">
+          <article class="panel detail-card">
+            <div class="section-heading">
+              <div><p class="eyebrow">POLICY CLAIMS</p><h2>What remains unresolved</h2></div>
+              <span id="claim-count" class="count"></span>
+            </div>
+            <div id="claims-list" class="stack-list"></div>
+          </article>
+
+          <article class="panel detail-card">
+            <div class="section-heading">
+              <div><p class="eyebrow">VERIFICATION</p><h2>Evidence recorded</h2></div>
+              <span id="check-count" class="count"></span>
+            </div>
+            <div id="checks-list" class="stack-list"></div>
+          </article>
+
+          <article class="panel detail-card task-card">
+            <div class="section-heading">
+              <div><p class="eyebrow">HUMAN WORK</p><h2>Review tasks</h2></div>
+              <span id="task-count" class="count"></span>
+            </div>
+            <div id="tasks-list" class="stack-list"></div>
+          </article>
+
+          <article class="panel detail-card observations-card">
+            <div class="section-heading">
+              <div><p class="eyebrow">AGENT / TOOL OUTPUT</p><h2>Candidate observations</h2></div>
+              <span id="observation-count" class="count"></span>
+            </div>
+            <p class="subtle">Candidates describe what an agent or tool reported. They are not conclusions.</p>
+            <div id="observations-list" class="stack-list"></div>
+          </article>
+        </section>
+
+        <footer class="package-footer">
+          <p>Package content digest <code id="package-digest"></code></p>
+          <p>This viewer displays the package's digest but does not verify it. A digest is not a signature and does not identify who produced the package.</p>
+        </footer>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>TO BUILD A FIRE</span>
+      <span>Human attention is finite. Evidence has limits.</span>
+    </footer>
+  </body>
+</html>
