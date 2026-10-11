@@ -14,9 +14,11 @@ readonly POOL_ID="gitlab"
 readonly PROVIDER_ID="showcase-main"
 readonly DEPLOYER_NAME="tbaf-gitlab-deployer"
 readonly RUNTIME_NAME="tbaf-review-explorer-runtime"
+readonly BUILD_NAME="tbaf-cloud-build"
 readonly DEPLOYER_EMAIL="${DEPLOYER_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 readonly RUNTIME_EMAIL="${RUNTIME_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
-readonly BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+readonly BUILD_EMAIL="${BUILD_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+readonly DEFAULT_BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 readonly ATTRIBUTE_CONDITION="assertion.project_id == '${GITLAB_PROJECT_ID}' && assertion.ref_path == 'refs/heads/main'"
 
 die() {
@@ -33,8 +35,8 @@ ACTUAL_PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(
 [[ "$ACTUAL_PROJECT_NUMBER" == "$PROJECT_NUMBER" ]] \
   || die "Configured project number does not match $PROJECT_ID; stop and inspect the gcloud target."
 ACTUAL_BUILD_SERVICE_ACCOUNT="$(gcloud builds get-default-service-account --project="$PROJECT_ID")"
-[[ "$ACTUAL_BUILD_SERVICE_ACCOUNT" == "$BUILD_SERVICE_ACCOUNT" ]] \
-  || die "Cloud Build's current service account differs from the one reviewed in this script."
+[[ "$ACTUAL_BUILD_SERVICE_ACCOUNT" == "$DEFAULT_BUILD_SERVICE_ACCOUNT" ]] \
+  || die "Cloud Build's current default service account differs from the one reviewed in this script."
 glab auth status --hostname gitlab.com >/dev/null || die "Authenticate glab with GitLab API access first."
 
 if [[ -n "$ACTIVE_ACCOUNT" ]]; then
@@ -42,9 +44,9 @@ if [[ -n "$ACTIVE_ACCOUNT" ]]; then
 else
   printf 'Google CLI is using its configured credential source (no active account listed).\n'
 fi
-printf 'Project: %s (%s)\nCloud Build service account: %s\n' \
-  "$PROJECT_ID" "$PROJECT_NUMBER" "$BUILD_SERVICE_ACCOUNT"
-printf 'This will enable APIs, create two service accounts, and add narrowly scoped IAM bindings.\n'
+printf 'Project: %s (%s)\nDefault Cloud Build service account (not used): %s\nDedicated build service account: %s\n' \
+  "$PROJECT_ID" "$PROJECT_NUMBER" "$DEFAULT_BUILD_SERVICE_ACCOUNT" "$BUILD_EMAIL"
+printf 'This will enable APIs, create three service accounts, and add narrowly scoped IAM bindings.\n'
 
 gcloud services enable \
   run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com \
@@ -86,7 +88,7 @@ else
   printf 'Existing OIDC provider settings match the expected GitLab project and main-branch restriction.\n'
 fi
 
-for account in "$DEPLOYER_EMAIL" "$RUNTIME_EMAIL"; do
+for account in "$DEPLOYER_EMAIL" "$RUNTIME_EMAIL" "$BUILD_EMAIL"; do
   if ! gcloud iam service-accounts describe "$account" --project="$PROJECT_ID" >/dev/null 2>&1; then
     account_name="${account%%@*}"
     gcloud iam service-accounts create "$account_name" \
@@ -99,7 +101,17 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${DEPLOYER_EMAIL}" --role="roles/serviceusage.serviceUsageConsumer" --condition=None --quiet
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" --role="roles/run.builder" --condition=None --quiet
+  --member="serviceAccount:${BUILD_EMAIL}" --role="roles/run.builder" --condition=None --quiet
+# The previous setup granted run.builder to the default Compute Engine account.
+# Remove only that grant; its pre-existing Editor role and all other bindings stay intact.
+if gcloud projects get-iam-policy "$PROJECT_ID" --format=json \
+  | jq -e --arg member "serviceAccount:${DEFAULT_BUILD_SERVICE_ACCOUNT}" \
+    '[.bindings[] | select(.role == "roles/run.builder" and (.members | index($member)))] | length > 0' \
+    >/dev/null; then
+  gcloud projects remove-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:${DEFAULT_BUILD_SERVICE_ACCOUNT}" \
+    --role="roles/run.builder" --condition=None --quiet
+fi
 gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_EMAIL" \
   --project="$PROJECT_ID" \
   --member="serviceAccount:${DEPLOYER_EMAIL}" \
@@ -130,6 +142,7 @@ set_gitlab_variable GCP_WIF_POOL_ID "$POOL_ID"
 set_gitlab_variable GCP_WIF_PROVIDER_ID "$PROVIDER_ID"
 set_gitlab_variable GCP_DEPLOYER_SERVICE_ACCOUNT "$DEPLOYER_EMAIL"
 set_gitlab_variable GCP_RUNTIME_SERVICE_ACCOUNT "$RUNTIME_EMAIL"
+set_gitlab_variable GCP_BUILD_SERVICE_ACCOUNT "$BUILD_EMAIL"
 set_gitlab_variable GCP_REGION "$REGION"
 
 printf '\nSetup complete. Protect the GitLab cloud-run-demo environment, then run the manual deploy job on protected main.\n'
