@@ -125,9 +125,9 @@ prompts:
         "change": {"project": "group/project", "mr_iid": 1, "head_sha": "<exact SHA>"},
         "source": {"agent": "inspect_mr", "version": "1"},
         "diff_coverage": {
-          "status": "complete|partial|unknown",
+          "status": "unknown",
           "paths": [],
-          "limitations": []
+          "limitations": ["State why complete patch coverage cannot be established"]
         },
         "observations": [{
           "id": "CMAP-001",
@@ -146,7 +146,8 @@ prompts:
       complete. Use partial if any file is marked collapsed or too_large, or if
       any supplied patch is visibly truncated; list affected changed paths and
       explain the limit. Use unknown if completeness cannot be established; include
-      a limitation. This field is a mapper-reported claim, not independently
+      a limitation. Choose exactly one status value: complete, partial, or unknown.
+      This field is a mapper-reported claim, not independently
       verified evidence. It must never lower the deterministic route or be treated
       as proof that unseen content is harmless. For complete, paths and limitations
       must both be empty. For partial or unknown, limitations must be non-empty.
