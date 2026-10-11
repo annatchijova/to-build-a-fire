@@ -168,6 +168,7 @@ Open `http://localhost:8080`. A non-root NGINX container and a protected, manual
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Scanner findings are not yet ingested into the Review Package; these jobs do not gate merge or deployment.
 - `web/` — local-first Review Package Explorer and illustrative sample.
 - `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration; OIDC/IAM setup remains pending.
+- `scripts/setup-cloud-run-gcp.sh` — terminal setup for project-scoped Google IAM/WIF and protected GitLab CI variables.
 - `docs/adr/` — architecture decisions and their assumptions.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.

@@ -166,6 +166,7 @@ Abrí `http://localhost:8080`. También están preparados un contenedor NGINX si
 - `.gitlab-ci.yml` — SAST de GitLab en pipelines de MR, contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Los hallazgos del scanner todavía no se incorporan al Review Package; estos jobs no habilitan merge ni despliegue.
 - `web/` — interfaz local-first para explorar Review Packages y un ejemplo ilustrativo.
 - `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run; falta configurar OIDC/IAM.
+- `scripts/setup-cloud-run-gcp.sh` — preparación desde terminal de IAM/WIF y variables protegidas de CI en GitLab.
 - `docs/adr/` — decisiones de arquitectura y sus supuestos.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
 - `visual/` — banner del proyecto y futuros recursos gráficos.
