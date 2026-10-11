@@ -1,6 +1,6 @@
 # TO BUILD A FIRE — Technical README
 
-This document describes the intended system and distinguishes current behavior. The repository contains a Python input contract, deterministic local attention router, read-only MR snapshot, bounded authorization invariant check, and SHA-bound linker for structured Duo candidate assessments. GitLab Duo has been exercised on live MRs with human approval before internal notes are posted. The linker and its default-branch CI job are being reviewed in GitLab MR !8; a live default-branch run is still needed to verify job-token access to MR notes. Arbitrary caller-supplied checks remain unauthenticated by the local CLI.
+This document describes the intended system and distinguishes current behavior. The repository contains a Python input contract, deterministic local attention router, read-only MR snapshot, bounded authorization invariant check, and SHA-bound linker for structured Duo candidate assessments. GitLab Duo has been exercised on live MRs with human approval before internal notes are posted. The default-branch linker returned `status: linked` for an exact-head assessment in pipeline [#2934731933](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934731933); the [live record](docs/live-e2e-assessment-link-2026-10-10.md) documents both that run and its provenance limits. Arbitrary caller-supplied checks remain unauthenticated by the local CLI.
 
 [English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
 
