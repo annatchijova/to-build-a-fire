@@ -114,6 +114,7 @@
           <span data-i18n="packageContents">In this package</span>
           <a href="#claims-section" data-i18n="claimsNav">Claims</a>
           <a href="#checks-section" data-i18n="evidenceNav">Evidence</a>
+          <a href="#sast-section" data-i18n="sastNav">SAST findings</a>
           <a href="#tasks-section" data-i18n="tasksNav">Review tasks</a>
           <a href="#observations-section" data-i18n="observationsNav">Candidate observations</a>
           <a id="mapper-nav" href="#mapper-section" hidden data-i18n="mapperNav">Mapper context</a>
@@ -135,6 +136,16 @@
               <span id="check-count" class="count"></span>
             </div>
             <div id="checks-list" class="stack-list"></div>
+          </article>
+
+          <article id="sast-section" class="panel detail-card sast-card">
+            <div class="section-heading">
+              <div><p class="eyebrow" data-i18n="sastEyebrow">GITLAB SAST</p><h2 data-i18n="sastTitle">Scanner findings on changed files</h2></div>
+              <span id="sast-status" class="state-pill"></span>
+            </div>
+            <p id="sast-assurance" class="subtle"></p>
+            <p id="sast-source" class="item-meta"></p>
+            <div id="sast-findings" class="stack-list"></div>
           </article>
 
           <article id="tasks-section" class="panel detail-card task-card">

@@ -200,7 +200,7 @@ def build_artifact(input_data: dict[str, Any]) -> dict[str, Any]:
     policy_record = dict(input_data["policy"])
     policy_record["sha256"] = hashlib.sha256(_canonical_bytes(input_data["policy"])).hexdigest()
     artifact = {
-        "schema_version": "tbaf.review-package/v2",
+        "schema_version": "tbaf.review-package/v3" if "sast_evidence" in input_data else "tbaf.review-package/v2",
         "change": input_data["change"],
         "policy": policy_record,
         "observations": input_data["observations"],
@@ -220,5 +220,8 @@ def build_artifact(input_data: dict[str, Any]) -> dict[str, Any]:
             "schedule_state": schedule_state,
         },
     }
+    if "sast_evidence" in input_data:
+        # Scanner reports remain separate advisory evidence; they do not affect routing.
+        artifact["sast_evidence"] = input_data["sast_evidence"]
     artifact["sha256"] = hashlib.sha256(_canonical_bytes(artifact)).hexdigest()
     return artifact

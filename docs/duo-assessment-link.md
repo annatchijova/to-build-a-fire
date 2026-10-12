@@ -1,7 +1,7 @@
 # Linking a Duo assessment to a Review Package
 
 `tbaf-link-assessment` creates a `tbaf.review-package-link/v2` envelope from a
-deterministic `tbaf.review-package/v2` artifact and a structured
+deterministic `tbaf.review-package/v2` or v3 artifact and a structured
 `tbaf.duo-assessment/v2` candidate assessment. It also accepts v1 assessments
 for compatibility and maps their missing completeness metadata to `unknown`.
 The input can be a JSON file or
