@@ -6,7 +6,6 @@
 
 When people and coding agents can open more merge requests than a team can carefully inspect, another stream of automated review comments can add to the queue. TO BUILD A FIRE is a project idea for directing review effort: gather evidence about a change, identify what remains unresolved, and show people where their judgment matters most.
 
-> **Project status:** GitLab CI has produced a live, read-only MR snapshot and run a bounded authorization invariant check against a seeded control. For MR !2 at head `e843e0d`, the check reported `FAIL`; the Review Package kept the claim `UNRESOLVED` and routed it to `TARGETED_REVIEW`. The pipeline passed because it generated the receipt; that is not a pass for the authorization claim. The Duo MR flow produced a `tbaf.duo-assessment/v2` candidate assessment after human approval. The default-branch linker returned `status: linked` for internal note `3992319519` on the exact package head, with mapper-reported `diff_coverage_status: complete`, in pipeline [#2935454761](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2935454761). This is one live exact-head association, not a measured error rate; the Notes API does not attest flow identity or independently authenticate the claimed agent source. GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) and produced one informational `bandit.B101` candidate. Review Package v3 now includes bounded SAST data from successful reports tied to the exact MR head, while keeping scanner findings advisory and outside the routing decision; see [`docs/sast-review-package.md`](docs/sast-review-package.md). Google IAM/WIF is configured for Cloud Run; protecting the `cloud-run-demo` GitLab environment returned HTTP 403 for the current role, so deployment and monitoring remain unfinished. The [demo script](docs/demo-script.md) uses verified evidence and marks Cloud Run as pending. See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).
 
 ## The problem
 
@@ -210,3 +209,15 @@ tbaf-route examples/review-input.json --policy examples/policy.json
 
 This local contract is an early single-MR core, not a merge gate, safety verdict, or measured reviewer-time reduction. The GitLab read-only MR snapshot has run live; see the [recorded result](docs/live-evidence-2026-10-09.md).
 See [TODO.md](TODO.md) for the build plan and level completion criteria.
+
+## Project status
+
+GitLab CI has produced a live, read-only MR snapshot and run a bounded authorization invariant check against a seeded control. For MR !2 at head `e843e0d`, the check reported `FAIL`; the Review Package kept the claim `UNRESOLVED` and routed it to `TARGETED_REVIEW`. The pipeline passed because it generated the receipt; that is not a pass for the authorization claim.
+
+The Duo MR flow produced a `tbaf.duo-assessment/v2` candidate assessment after human approval. The default-branch linker returned `status: linked` for internal note `3992319519` on the exact package head, with mapper-reported `diff_coverage_status: complete`, in pipeline [#2935454761](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2935454761). This is one live exact-head association, not a measured error rate; the Notes API does not attest flow identity or independently authenticate the claimed agent source.
+
+GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) and produced one informational `bandit.B101` candidate. Review Package v3 now includes bounded SAST data from successful reports tied to the exact MR head. Scanner findings remain advisory and outside the routing decision; see [`docs/sast-review-package.md`](docs/sast-review-package.md).
+
+Google IAM/WIF is configured for Cloud Run. Protecting the `cloud-run-demo` GitLab environment returned HTTP 403 for the current role, so deployment and monitoring remain unfinished. The [demo script](docs/demo-script.md) uses verified evidence and marks Cloud Run as pending.
+
+See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).
