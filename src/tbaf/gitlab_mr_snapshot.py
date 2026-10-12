@@ -23,6 +23,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 from .auth_invariants import MAX_SOURCE_BYTES, build_authorization_check
 from .contract import ContractError, parse_input
 from .router import build_artifact
+from .sast_evidence import collect_sast_evidence
 
 _SHA_RE = re.compile(r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 _INTEGER_RE = re.compile(r"\A[1-9][0-9]{0,8}\Z")
@@ -218,6 +219,16 @@ def create_snapshot(mr_iid: str) -> dict[str, Any]:
             auth_source = None
         checks.append(build_authorization_check(auth_source, head_sha))
 
+    sast_evidence = collect_sast_evidence(
+        api_root, _required_env("CI_SERVER_URL", maximum=2048), project_id,
+        int(mr_iid), head_sha, changed_paths,
+    )
+    # The MR may advance while public pipeline metadata and its artifact are read.
+    # Refuse to emit a package if the captured identity changed during collection.
+    latest_mr = _api_json(api_root, project_id, mr_iid, job_token)
+    if latest_mr.get("sha") != head_sha:
+        raise ContractError("the MR changed during SAST capture; rerun against its current head")
+
     review_input = {
         "schema_version": "tbaf.review-input/v1",
         "change": {
@@ -229,6 +240,7 @@ def create_snapshot(mr_iid: str) -> dict[str, Any]:
         },
         "observations": [],
         "checks": checks,
+        "sast_evidence": sast_evidence,
     }
     parsed = parse_input(json.dumps(review_input, ensure_ascii=False), policy_data)
     return build_artifact(parsed)

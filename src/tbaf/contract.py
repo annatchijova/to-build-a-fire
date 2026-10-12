@@ -180,7 +180,7 @@ def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
     raw = _decode_json(data, "input")
 
     top = _keys(raw, {"schema_version", "change", "observations", "checks"},
-                {"schema_version", "change", "observations", "checks"}, "input")
+                {"schema_version", "change", "observations", "checks", "sast_evidence"}, "input")
     if top["schema_version"] != INPUT_SCHEMA:
         raise ContractError(f"schema_version must be {INPUT_SCHEMA}")
 
@@ -299,10 +299,126 @@ def parse_input(data: bytes | str, policy_data: bytes | str) -> dict[str, Any]:
         if check["claim_id"] not in known_claims:
             raise ContractError(f"check {check['id']} refers to unknown claim {check['claim_id']}")
 
-    return {
+    parsed = {
         "schema_version": INPUT_SCHEMA,
         "change": {"project": project, "mr_iid": mr_iid, "base_sha": base_sha, "head_sha": head_sha, "paths": paths},
         "policy": policy,
         "observations": observations,
         "checks": checks,
+    }
+    if "sast_evidence" in top:
+        parsed["sast_evidence"] = _parse_sast_evidence(
+            top["sast_evidence"], head_sha, int(mr_iid), set(paths),
+        )
+    return parsed
+
+
+def _parse_sast_evidence(
+    value: Any, head_sha: str, mr_iid: int, changed_paths: set[str],
+) -> dict[str, Any]:
+    """Validate an advisory GitLab SAST report already bound by the snapshot job."""
+    where = "sast_evidence"
+    record = _keys(
+        value,
+        {"schema_version", "status", "reason_code", "source", "scanner", "findings",
+         "reported_finding_count", "unchanged_path_finding_count", "omitted_finding_count"},
+        {"schema_version", "status", "reason_code", "source", "scanner", "findings",
+         "reported_finding_count", "unchanged_path_finding_count", "omitted_finding_count"},
+        where,
+    )
+    if record["schema_version"] != "tbaf.sast-evidence/v1":
+        raise ContractError(f"{where}.schema_version is unsupported")
+    status = _text(record["status"], f"{where}.status", limit=16)
+    if status not in {"available", "no_findings", "partial", "unavailable"}:
+        raise ContractError(f"{where}.status is unsupported")
+    reason_code = record["reason_code"]
+    if reason_code is not None:
+        reason_code = _identity(reason_code, f"{where}.reason_code")
+    reported_count = _integer(record["reported_finding_count"], f"{where}.reported_finding_count", maximum=100_000)
+    unchanged_count = _integer(record["unchanged_path_finding_count"], f"{where}.unchanged_path_finding_count", maximum=100_000)
+    omitted_count = _integer(record["omitted_finding_count"], f"{where}.omitted_finding_count", maximum=100_000)
+    findings = []
+    for index, item in enumerate(_list(record["findings"], f"{where}.findings", maximum=500)):
+        fw = f"{where}.findings[{index}]"
+        finding = _keys(item, {"finding_id", "name", "severity", "path", "start_line", "end_line", "identifiers"},
+                        {"finding_id", "name", "severity", "path", "start_line", "end_line", "identifiers"}, fw)
+        path = _path(finding["path"], f"{fw}.path")
+        if path not in changed_paths:
+            raise ContractError(f"{fw}.path is outside the changed paths")
+        severity = _text(finding["severity"], f"{fw}.severity", limit=16)
+        if severity not in {"Info", "Unknown", "Low", "Medium", "High", "Critical"}:
+            raise ContractError(f"{fw}.severity is unsupported")
+        start = _integer(finding["start_line"], f"{fw}.start_line", minimum=1, maximum=10_000_000)
+        end = _integer(finding["end_line"], f"{fw}.end_line", minimum=start, maximum=10_000_000)
+        identifiers = []
+        for ii, raw_identifier in enumerate(_list(finding["identifiers"], f"{fw}.identifiers", maximum=20)):
+            iw = f"{fw}.identifiers[{ii}]"
+            identifier = _keys(raw_identifier, {"type", "value"}, {"type", "value"}, iw)
+            identifiers.append({
+                "type": _text(identifier["type"], f"{iw}.type", limit=64),
+                "value": _text(identifier["value"], f"{iw}.value", limit=256),
+            })
+        findings.append({
+            "finding_id": _text(finding["finding_id"], f"{fw}.finding_id", limit=64),
+            "name": _text(finding["name"], f"{fw}.name", limit=512),
+            "severity": severity,
+            "path": path,
+            "start_line": start,
+            "end_line": end,
+            "identifiers": identifiers,
+        })
+
+    source = record["source"]
+    scanner = record["scanner"]
+    if status == "unavailable":
+        if (source is not None or scanner is not None or findings or reason_code is None
+                or reported_count or unchanged_count or omitted_count):
+            raise ContractError(f"{where} unavailable state must carry a reason and no report data")
+    else:
+        source = _keys(source, {"pipeline_id", "job_id", "ref", "head_sha", "binding"},
+                       {"pipeline_id", "job_id", "ref", "head_sha", "binding"}, f"{where}.source")
+        source_head = _text(source["head_sha"], f"{where}.source.head_sha", limit=64)
+        if source_head != head_sha or not _SHA_RE.fullmatch(source_head):
+            raise ContractError(f"{where}.source.head_sha must match the Review Package head SHA")
+        source = {
+            "pipeline_id": _integer(source["pipeline_id"], f"{where}.source.pipeline_id", minimum=1),
+            "job_id": _integer(source["job_id"], f"{where}.source.job_id", minimum=1),
+            "ref": _text(source["ref"], f"{where}.source.ref", limit=255),
+            "head_sha": source_head,
+            "binding": _text(source["binding"], f"{where}.source.binding", limit=64),
+        }
+        if (source["binding"] != "gitlab_pipeline_and_job_metadata"
+                or source["ref"] != f"refs/merge-requests/{mr_iid}/head"):
+            raise ContractError(f"{where}.source metadata must match the MR ref and binding")
+        scanner = _keys(scanner, {"name", "version", "analyzer", "analyzer_version"},
+                        {"name", "version", "analyzer", "analyzer_version"}, f"{where}.scanner")
+        scanner = {
+            "name": _text(scanner["name"], f"{where}.scanner.name", limit=128),
+            "version": _text(scanner["version"], f"{where}.scanner.version", limit=128),
+            "analyzer": _text(scanner["analyzer"], f"{where}.scanner.analyzer", limit=128),
+            "analyzer_version": _text(scanner["analyzer_version"], f"{where}.scanner.analyzer_version", limit=128),
+        }
+        if reason_code is not None:
+            raise ContractError(f"{where}.reason_code must be null when a report is available")
+        if reported_count < len(findings) + unchanged_count or omitted_count != max(0, reported_count - unchanged_count - len(findings)):
+            raise ContractError(f"{where} finding counts are inconsistent")
+        if status == "no_findings" and (findings or omitted_count):
+            raise ContractError(f"{where}.no_findings must have no changed-path findings")
+        if status == "available" and (not findings or omitted_count):
+            raise ContractError(f"{where}.available must contain findings and no omitted findings")
+        if status == "partial" and omitted_count == 0:
+            raise ContractError(f"{where}.partial must report omitted findings")
+        if status == "partial" and not findings:
+            raise ContractError(f"{where}.partial must retain at least one changed-path finding")
+
+    return {
+        "schema_version": "tbaf.sast-evidence/v1",
+        "status": status,
+        "reason_code": reason_code,
+        "source": source,
+        "scanner": scanner,
+        "findings": findings,
+        "reported_finding_count": reported_count,
+        "unchanged_path_finding_count": unchanged_count,
+        "omitted_finding_count": omitted_count,
     }

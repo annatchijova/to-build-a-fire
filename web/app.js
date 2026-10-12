@@ -34,7 +34,7 @@ const COPY = {
     exampleNotice: "Example data only. This is not a live merge request or a security verdict.",
     changeLabel: "CHANGE", mrLabel: "MR", headShaLabel: "Head SHA", changedPathsLabel: "Changed paths", policyLabel: "Policy",
     routeLabel: "ATTENTION ROUTE", whyRoute: "Why this route", capacityLabel: "Capacity", demandLabel: "Known demand", uncoveredLabel: "Still uncovered",
-    packageContents: "In this package", claimsNav: "Claims", evidenceNav: "Evidence", tasksNav: "Review tasks", observationsNav: "Candidate observations", mapperNav: "Mapper context", integrityNav: "Package integrity",
+    packageContents: "In this package", claimsNav: "Claims", evidenceNav: "Evidence", sastNav: "SAST findings", tasksNav: "Review tasks", observationsNav: "Candidate observations", mapperNav: "Mapper context", integrityNav: "Package integrity",
     claimsEyebrow: "POLICY CLAIMS", claimsTitle: "What remains unresolved", verificationEyebrow: "VERIFICATION", verificationTitle: "Evidence recorded",
     humanWorkEyebrow: "HUMAN WORK", tasksTitle: "Review tasks", agentOutputEyebrow: "AGENT / TOOL OUTPUT", observationsTitle: "Candidate observations",
     observationsHint: "Candidates describe what an agent or tool reported. They are not conclusions.", mapperEyebrow: "DUO CHANGE MAPPER", mapperTitle: "What the agent could inspect", mapperObservationsTitle: "Candidate observations",
@@ -49,10 +49,16 @@ const COPY = {
     noCoverageLimits: "No coverage limitations reported by the mapper.", noMapperObservations: "No candidate observations were supplied.",
     mapperAssuranceReported: "The agent reports this coverage state. The linker binds it to the exact MR head, but does not verify the claim. It never changes the deterministic route.",
     mapperAssuranceLegacy: "This legacy assessment has no structured coverage field. Coverage is unknown; absence of a warning is not evidence of a complete diff.",
+    sastEyebrow: "GITLAB SAST", sastTitle: "Scanner findings on changed files", sastAssurance: "Scanner findings are candidate evidence, not a security verdict. Only findings in changed files are listed; this section does not change the deterministic attention route.",
+    sastLegacy: "This package predates SAST collection.", sastUnavailable: "No exact-head SAST report was available for this snapshot.", sastNoFindings: "The exact-head report contained no findings in changed files.", sastFindingsSummary: "{count} candidate finding(s) in changed files.", sastPartial: "Some changed-file findings were omitted because the display limit was reached.",
+    sastOutsideDiff: "Findings in unchanged files, not attributed to this change", sastReportSource: "{scanner} {version} · analyzer {analyzer} {analyzerVersion} · pipeline {pipeline} · job {job} · head {sha}", sastReason: "Reason", sastLine: "Line", sastIdentifiers: "Identifiers", sastOmitted: "Omitted findings: {count}",
+    noSastFindings: "No changed-file findings to display.", invalidSast: "The package contains invalid SAST evidence.",
+    available: "Available", noFindings: "No findings in changed files", unavailable: "Unavailable", legacy: "Not collected", info: "Info", low: "Low", medium: "Medium", high: "High",
+    noSastPipelineForHead: "no successful SAST pipeline for this head", pipelineMetadataUnavailable: "pipeline metadata unavailable", pipelineMetadataInvalid: "pipeline metadata invalid", sastArtifactUnavailable: "SAST job or artifact unavailable", sastReportInvalid: "SAST report invalid", gitlabApiUnavailable: "GitLab API unavailable",
     reported: "reported", unknownLegacy: "unknown · legacy", limitation: "Limitation", affectedPath: "Affected path", openReasons: "Open reasons",
     packageTooLarge: "The package exceeds the 2 MB limit.", fileTooLarge: "The selected file exceeds the 2 MB limit.", invalidJson: "The file is not valid JSON. Check that you selected the Review Package artifact.",
     pageDescription: "See how GitLab CI turns merge request evidence into a human review plan. Try an example or open a downloaded report.",
-    unsupportedPackage: "This file is not a supported tbaf.review-package/v2 document.", missingFields: "The package is missing required change, policy, evidence, or routing fields.", tooManyRows: "A package section exceeds the {limit}-item display limit.", invalidPath: "The package contains a changed path that is invalid or too long to display.",
+    unsupportedPackage: "This file is not a supported tbaf.review-package/v2 or v3 document.", missingFields: "The package is missing required change, policy, evidence, or routing fields.", tooManyRows: "A package section exceeds the {limit}-item display limit.", invalidPath: "The package contains a changed path that is invalid or too long to display.",
     unsupportedLinked: "This is not a supported linked Review Package v2 document.", invalidMapper: "The linked assessment is missing valid candidate or diff coverage metadata.", exampleFailed: "Could not load the example (HTTP {status}). Try again or open a downloaded CI report.",
     change: "change", attentionRoute: "attention route", policyClaims: "policy claims", verification: "verification", humanWork: "human work", agentToolOutput: "agent / tool output", duoChangeMapper: "Duo change mapper",
     candidate: "Candidate", unknown: "Unknown", unresolved: "Unresolved", supported: "Supported", contradicted: "Contradicted", pass: "Pass", fail: "Fail", affected: "Affected", notAffected: "Not affected", critical: "Critical", unknownConsequence: "Unknown",
@@ -78,7 +84,7 @@ const COPY = {
     exampleNotice: "Solo datos de ejemplo. No es un merge request activo ni un veredicto de seguridad.",
     changeLabel: "EL CAMBIO", mrLabel: "Solicitud", headShaLabel: "Versión del cambio", changedPathsLabel: "Archivos modificados", policyLabel: "Reglas aplicadas",
     routeLabel: "NIVEL DE REVISIÓN", whyRoute: "Por qué se asignó este nivel", capacityLabel: "Tiempo disponible", demandLabel: "Tiempo estimado", uncoveredLabel: "Trabajo sin cubrir",
-    packageContents: "Secciones del informe", claimsNav: "Afirmaciones revisadas", evidenceNav: "Verificaciones", tasksNav: "Trabajo pendiente", observationsNav: "Observaciones del agente", mapperNav: "Alcance del agente", integrityNav: "Datos del archivo",
+    packageContents: "Secciones del informe", claimsNav: "Afirmaciones revisadas", evidenceNav: "Verificaciones", sastNav: "Hallazgos SAST", tasksNav: "Trabajo pendiente", observationsNav: "Observaciones del agente", mapperNav: "Alcance del agente", integrityNav: "Datos del archivo",
     claimsEyebrow: "AFIRMACIONES QUE REVISA LA POLÍTICA", claimsTitle: "Estado de cada afirmación", verificationEyebrow: "VERIFICACIONES", verificationTitle: "Comprobaciones registradas",
     humanWorkEyebrow: "REVISIÓN HUMANA", tasksTitle: "Puntos que requieren atención", agentOutputEyebrow: "ANÁLISIS AUTOMÁTICO", observationsTitle: "Observaciones del agente",
     observationsHint: "Son indicios para revisar, no conclusiones ni veredictos de seguridad.", mapperEyebrow: "ALCANCE DEL ANÁLISIS AUTOMÁTICO", mapperTitle: "Qué archivos pudo revisar el agente", mapperObservationsTitle: "Observaciones del agente",
@@ -93,10 +99,16 @@ const COPY = {
     noCoverageLimits: "El agente no informó límites sobre los archivos que pudo revisar.", noMapperObservations: "El agente no informó observaciones.",
     mapperAssuranceReported: "El agente informa qué parte del cambio pudo revisar. El linker confirma que la nota corresponde a esta versión del cambio, pero no comprueba lo que afirma el agente. Este dato no cambia el nivel de revisión asignado por las reglas.",
     mapperAssuranceLegacy: "Esta evaluación no indica qué parte del cambio pudo revisar el agente. Que no haya una advertencia no demuestra que haya revisado todos los archivos.",
+    sastEyebrow: "GITLAB SAST", sastTitle: "Hallazgos del scanner en archivos modificados", sastAssurance: "Los hallazgos del scanner son indicios, no veredictos de seguridad. Solo se muestran los que están en archivos modificados; esta sección no cambia el nivel de atención determinista.",
+    sastLegacy: "Este paquete se generó antes de integrar SAST.", sastUnavailable: "No hubo un informe SAST disponible para este SHA exacto.", sastNoFindings: "El informe de este SHA no encontró hallazgos en archivos modificados.", sastFindingsSummary: "Hallazgos candidatos en archivos modificados: {count}.", sastPartial: "Se omitieron algunos hallazgos de archivos modificados al alcanzar el límite de visualización.",
+    sastOutsideDiff: "Hallazgos en archivos sin cambios; no se atribuyen a este cambio", sastReportSource: "{scanner} {version} · analizador {analyzer} {analyzerVersion} · pipeline {pipeline} · job {job} · SHA {sha}", sastReason: "Motivo", sastLine: "Línea", sastIdentifiers: "Identificadores", sastOmitted: "Hallazgos omitidos: {count}",
+    noSastFindings: "No hay hallazgos de archivos modificados para mostrar.", invalidSast: "El paquete contiene evidencia SAST inválida.",
+    available: "Disponible", noFindings: "Sin hallazgos en archivos modificados", unavailable: "No disponible", legacy: "No recopilado", info: "Info", low: "Baja", medium: "Media", high: "Alta",
+    noSastPipelineForHead: "no hubo una pipeline SAST exitosa para este SHA", pipelineMetadataUnavailable: "metadatos de pipeline no disponibles", pipelineMetadataInvalid: "metadatos de pipeline inválidos", sastArtifactUnavailable: "job o artefacto SAST no disponible", sastReportInvalid: "informe SAST inválido", gitlabApiUnavailable: "API de GitLab no disponible",
     reported: "reportada", unknownLegacy: "desconocida · versión anterior", limitation: "Límite", affectedPath: "Ruta afectada", openReasons: "Motivos pendientes",
     packageTooLarge: "El paquete supera el límite de 2 MB.", fileTooLarge: "El archivo seleccionado supera el límite de 2 MB.", invalidJson: "El archivo no es JSON válido. Verificá que seleccionaste el artefacto Review Package.",
     pageDescription: "Mirá cómo GitLab CI convierte evidencia de un merge request en un plan de revisión humana. Probá un ejemplo o abrí un informe descargado.",
-    unsupportedPackage: "Este archivo no es un documento tbaf.review-package/v2 compatible.", missingFields: "Al paquete le faltan campos obligatorios de cambio, política, evidencia o ruta.", tooManyRows: "Una sección del paquete supera el límite de {limit} elementos.", invalidPath: "El paquete contiene una ruta modificada inválida o demasiado larga.",
+    unsupportedPackage: "Este archivo no es un documento tbaf.review-package/v2 o v3 compatible.", missingFields: "Al paquete le faltan campos obligatorios de cambio, política, evidencia o ruta.", tooManyRows: "Una sección del paquete supera el límite de {limit} elementos.", invalidPath: "El paquete contiene una ruta modificada inválida o demasiado larga.",
     unsupportedLinked: "Este no es un paquete enlazado v2 compatible.", invalidMapper: "La evaluación enlazada no tiene metadatos válidos de observaciones o cobertura del diff.", exampleFailed: "No se pudo cargar el ejemplo (HTTP {status}). Volvé a intentarlo o abrí un informe de CI descargado.",
     change: "cambio", attentionRoute: "ruta de atención", policyClaims: "afirmaciones de la política", verification: "verificación", humanWork: "trabajo humano", agentToolOutput: "resultado de agente / herramienta", duoChangeMapper: "Duo Change Mapper",
     candidate: "Candidata", unknown: "Desconocido", unresolved: "Sin resolver", supported: "Respaldada", contradicted: "Contradicha", pass: "Aprobado", fail: "Falló", affected: "Afectado", notAffected: "No afectado", critical: "Crítica", unknownConsequence: "Desconocida",
@@ -111,6 +123,8 @@ const NORMALIZED_LABELS = {
   unresolved: "unresolved", supported: "supported", contradicted: "contradicted", pass: "pass", fail: "fail",
   affected: "affected", not_affected: "notAffected", critical: "critical", unknown: "unknown",
   unknown_consequence: "unknownConsequence",
+  available: "available", no_findings: "noFindings", unavailable: "unavailable", legacy: "legacy", info: "info", low: "low", medium: "medium", high: "high",
+  no_successful_sast_pipeline_for_head: "noSastPipelineForHead", pipeline_metadata_unavailable: "pipelineMetadataUnavailable", pipeline_metadata_invalid: "pipelineMetadataInvalid", sast_job_or_artifact_unavailable: "sastArtifactUnavailable", sast_report_invalid: "sastReportInvalid", gitlab_api_unavailable: "gitlabApiUnavailable",
   complete: "complete", partial: "partial", within_capacity: "withinCapacity", partial_unknown_demand: "partialUnknownDemand", over_capacity: "overCapacity",
   targeted_review: "targetedReview", deep_review: "deepReview", covered_by_evidence: "coveredByEvidence",
   required_check_missing: "requiredCheckMissing", required_check_fail: "requiredCheckFail",
@@ -192,7 +206,7 @@ function isObject(value) {
 }
 
 function validatePackage(value) {
-  if (!isObject(value) || value.schema_version !== "tbaf.review-package/v2") {
+  if (!isObject(value) || !["tbaf.review-package/v2", "tbaf.review-package/v3"].includes(value.schema_version)) {
     throw new Error(t("unsupportedPackage"));
   }
   if (!isObject(value.change) || !SHA_PATTERN.test(value.change.head_sha || "")
@@ -208,6 +222,36 @@ function validatePackage(value) {
   }
   if (value.change.paths.some((path) => typeof path !== "string" || path.length > MAX_PATH_CHARS)) {
     throw new Error(t("invalidPath"));
+  }
+  if (value.sast_evidence !== undefined) {
+    const sast = value.sast_evidence;
+    if (!isObject(sast) || sast.schema_version !== "tbaf.sast-evidence/v1"
+        || !["available", "no_findings", "partial", "unavailable"].includes(sast.status)
+        || !Array.isArray(sast.findings) || sast.findings.length > MAX_ROWS_PER_SECTION
+        || !Number.isInteger(sast.reported_finding_count) || sast.reported_finding_count < 0
+        || !Number.isInteger(sast.unchanged_path_finding_count) || sast.unchanged_path_finding_count < 0
+        || !Number.isInteger(sast.omitted_finding_count) || sast.omitted_finding_count < 0
+        || (sast.status === "unavailable" ? sast.source !== null || sast.scanner !== null
+          : !isObject(sast.source) || sast.source.head_sha !== value.change.head_sha
+            || sast.source.ref !== `refs/merge-requests/${value.change.mr_iid}/head`
+            || sast.source.binding !== "gitlab_pipeline_and_job_metadata"
+            || !Number.isInteger(sast.source.pipeline_id) || !Number.isInteger(sast.source.job_id)
+            || !isObject(sast.scanner) || typeof sast.scanner.name !== "string"
+            || typeof sast.scanner.version !== "string" || typeof sast.scanner.analyzer !== "string"
+            || typeof sast.scanner.analyzer_version !== "string")
+        || sast.findings.some((finding) => !isObject(finding) || typeof finding.name !== "string"
+          || !["Info", "Unknown", "Low", "Medium", "High", "Critical"].includes(finding.severity) || typeof finding.path !== "string"
+          || !value.change.paths.includes(finding.path) || !Number.isInteger(finding.start_line)
+          || !Number.isInteger(finding.end_line) || finding.start_line < 1 || finding.end_line < finding.start_line
+          || !Array.isArray(finding.identifiers) || finding.identifiers.length > 20
+          || finding.identifiers.some((identifier) => !isObject(identifier)
+            || typeof identifier.type !== "string" || identifier.type.length > 64
+            || typeof identifier.value !== "string" || identifier.value.length > 256))) {
+      throw new Error(t("invalidSast"));
+    }
+  }
+  if (value.schema_version === "tbaf.review-package/v3" && value.sast_evidence === undefined) {
+    throw new Error(t("invalidSast"));
   }
   return value;
 }
@@ -291,6 +335,47 @@ function renderMapper(mapper) {
     });
 }
 
+function renderSast(packageData) {
+  const sast = packageData.sast_evidence;
+  const status = document.querySelector("#sast-status");
+  const assurance = document.querySelector("#sast-assurance");
+  const source = document.querySelector("#sast-source");
+  const list = document.querySelector("#sast-findings");
+  const state = sast?.status || "legacy";
+  status.textContent = label(state);
+  status.className = `state-pill sast-${state}`;
+  assurance.textContent = !sast ? t("sastLegacy")
+    : state === "unavailable" ? `${t("sastUnavailable")} ${t("sastReason")}: ${label(sast.reason_code)}`
+      : state === "no_findings" ? t("sastNoFindings")
+        : state === "partial" ? `${t("sastFindingsSummary", { count: sast.findings.length })} ${t("sastPartial")}`
+          : t("sastFindingsSummary", { count: sast.findings.length });
+  source.textContent = sast?.source
+    ? t("sastReportSource", {
+      scanner: sast.scanner.name, version: sast.scanner.version,
+      analyzer: sast.scanner.analyzer, analyzerVersion: sast.scanner.analyzer_version,
+      pipeline: sast.source.pipeline_id, job: sast.source.job_id, sha: sast.source.head_sha,
+    })
+    : "";
+  list.replaceChildren();
+  if (sast?.unchanged_path_finding_count) {
+    list.append(node("p", "item-meta", `${t("sastOutsideDiff")}: ${sast.unchanged_path_finding_count}`));
+  }
+  if (sast?.omitted_finding_count) {
+    list.append(node("p", "item-meta", t("sastOmitted", { count: sast.omitted_finding_count })));
+  }
+  for (const finding of sast?.findings || []) {
+    const card = node("section", "item-card sast-finding");
+    const top = node("div", "item-topline");
+    top.append(node("h3", "item-title", finding.name));
+    top.append(node("span", `severity-pill severity-${String(finding.severity).toLowerCase()}`, label(finding.severity)));
+    card.append(top, node("p", "item-meta", `${finding.path}:${finding.start_line}-${finding.end_line}`));
+    if (finding.identifiers.length) {
+      card.append(node("p", "item-meta", `${t("sastIdentifiers")}: ${finding.identifiers.map((item) => `${item.type}:${item.value}`).join(" · ")}`));
+    }
+    list.append(card);
+  }
+}
+
 function renderPackage(packageData, isExample, mapper = null) {
   const change = packageData.change;
   const attention = packageData.attention;
@@ -346,6 +431,8 @@ function renderPackage(packageData, isExample, mapper = null) {
     if (check.details) card.append(node("p", "item-text", check.details));
     return card;
   });
+
+  renderSast(packageData);
 
   document.querySelector("#task-count").textContent = String(attention.tasks.length);
   renderList(document.querySelector("#tasks-list"), attention.tasks, t("noTasks"), (task) => {

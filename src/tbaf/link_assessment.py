@@ -42,8 +42,10 @@ def _read_regular_file(path_text: str, label: str) -> bytes:
 
 def _verified_package(data: bytes) -> dict[str, Any]:
     package = _decode_json(data, "review package")
-    if not isinstance(package, dict) or package.get("schema_version") != "tbaf.review-package/v2":
-        raise ContractError("review package schema_version must be tbaf.review-package/v2")
+    if not isinstance(package, dict) or package.get("schema_version") not in {
+        "tbaf.review-package/v2", "tbaf.review-package/v3",
+    }:
+        raise ContractError("review package schema_version must be tbaf.review-package/v2 or v3")
     digest = package.get("sha256")
     if not isinstance(digest, str) or not _HEX_256_RE.fullmatch(digest):
         raise ContractError("review package sha256 is missing or malformed")
@@ -70,6 +72,8 @@ def _verified_package(data: bytes) -> dict[str, Any]:
         "observations": package.get("observations"),
         "checks": package.get("checks"),
     }
+    if "sast_evidence" in package:
+        review_input["sast_evidence"] = package["sast_evidence"]
     parsed = parse_input(
         json.dumps(review_input, ensure_ascii=False),
         json.dumps(policy_document, ensure_ascii=False),
