@@ -10,5 +10,5 @@ This directory holds supporting documents for TO BUILD A FIRE.
 - [`demo-script.md`](demo-script.md) is a timed, evidence-bound draft for the hackathon video.
 - [`../evaluation/adversarial-cases.md`](../evaluation/adversarial-cases.md) records adversarial scenarios and scoring constraints; fixture outcomes are contract checks, not quality metrics.
 - [`../evaluation/run_cases.py`](../evaluation/run_cases.py) runs the fixture-backed deterministic contract cases; it reports unsupported cases separately and does not claim a quality score.
-- [`hackathon-path-b.md`](hackathon-path-b.md) tracks the Path B / Assisted lifecycle contract and current integration evidence.
+- [`hackathon-track-a.md`](hackathon-track-a.md) tracks the Track A / Start Fresh, Assisted lifecycle contract and current integration evidence.
 - Adversarial design reviews and supporting evidence belong in [`red-team/`](red-team/).

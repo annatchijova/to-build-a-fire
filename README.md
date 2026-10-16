@@ -121,11 +121,13 @@ sequenceDiagram
 
 ## Hackathon direction
 
+TO BUILD A FIRE was created specifically for GitLab Transcend: Life After Code and is entered under **Track A — Start Fresh**, with Assisted autonomy. The GitLab Showcase project is the hackathon integration environment; GitHub is kept in sync as its public mirror.
+
 The planned evaluation uses seeded changes and benign controls: generated diffs, dependency updates, formatting-only refactors, missing tests, two-line authorization widening, removed scanners, weakened assertions, reduced coverage thresholds, CI commands ending in `|| true`, and stale-versus-exact-head Duo assessments. The inventory is in [`evaluation/corpus.json`](evaluation/corpus.json). Separate fixture-backed CI jobs check the deterministic router contract through [`evaluation/run_cases.py`](evaluation/run_cases.py) and the Duo assessment-link contract through [`evaluation/run_link_cases.py`](evaluation/run_link_cases.py). These checks do not measure attack-detection quality or the truth of mapper-reported diff completeness. [`test_gitlab_assessment_link.py`](tests/test_gitlab_assessment_link.py) also checks that a stale assessment is rejected and an exact-head assessment links without changing the deterministic package. The full evaluation is intended to measure critical cases routed to people, unnecessary benign escalations, minutes of human review against a declared baseline, and unsupported conclusions. No product-level metrics have been measured yet.
 
 The planned demonstration contrasts a large, mostly generated change with a tiny authorization change, then shows the attention demand against team capacity. It should show how evidence and protected claims affect routing, rather than claim that the system has already reduced review time.
 
-The target demo maps one connected MR flow across all nine post-code lifecycle stages. The coverage table and evidence required for each are in the [Path B / Assisted build contract](docs/hackathon-path-b.md#nine-stage-coverage-contract). This is a target, not a claim that the integrations already run.
+The target demo maps one connected MR flow across all nine post-code lifecycle stages. The coverage table and evidence required for each are in the [Track A / Assisted build contract](docs/hackathon-track-a.md#nine-stage-coverage-contract). This is a target, not a claim that the integrations already run.
 
 The concept maps to the post-code lifecycle the GitLab Transcend hackathon asks participants to explore:
 
@@ -162,7 +164,7 @@ Open `http://localhost:18765`. A non-root NGINX container and a protected, manua
 - `README.es.md` — Spanish version of the overview.
 - `TECHNICAL_README.md` — proposed architecture, decision boundary, evidence model, and open questions.
 - `TODO.md` — complete product destination, build levels, inherited invariants, and closure criteria.
-- `docs/hackathon-path-b.md` — end-to-end Assisted path, lifecycle evidence map, access dependencies, and Path B submission proof.
+- `docs/hackathon-track-a.md` — Track A / Assisted lifecycle contract, integration evidence, access dependencies, and submission proof.
 - `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Exact-head SAST findings are included as advisory evidence in Review Package v3; missing or inaccessible reports remain visibly unavailable and do not change routing. See [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — local-first Review Package Explorer and illustrative sample.
@@ -220,4 +222,4 @@ GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackat
 
 Google IAM/WIF is configured for Cloud Run. Protecting the `cloud-run-demo` GitLab environment returned HTTP 403 for the current role, so deployment and monitoring remain unfinished. The [demo script](docs/demo-script.md) uses verified evidence and marks Cloud Run as pending.
 
-See [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).
+See [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).

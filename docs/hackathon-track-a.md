@@ -1,10 +1,15 @@
-# Hackathon build contract — Path B, Assisted
+# Hackathon build contract — Track A (Start Fresh), Assisted
 
 **Event:** GitLab Transcend: Life After Code
-**Path:** Bring Your Own
+**Track:** Start Fresh
 **Autonomy:** Assisted
 **Build window:** new automation and deployment work begins on or after 2026-10-05.
 **Cloud target:** Google Cloud Run, selected by the project owner for the optional Google Cloud track.
+
+TO BUILD A FIRE was created specifically for this hackathon. It is entered under
+**Track A — Start Fresh**. The GitLab Showcase project is the hackathon project
+and carries its CI, Duo flow, and live integration evidence. GitHub is kept in
+sync as the public mirror.
 
 This document separates the product's maturity levels from hackathon lifecycle coverage. A maturity level is a complete, useful product state. The nine GitLab lifecycle stages are a coverage axis that the first connected end-to-end level must cross. They are not nine disconnected mini-projects.
 
@@ -81,12 +86,13 @@ GitLab UI flows run in CI/CD. The Flow Registry supports `require_tool_approval:
 
 The project flow was created in GitLab's UI, enabled, and exercised on MRs !1 and !2 with human approval before posting internal notes. The checked-in `.gitlab/duo/flows/attention-review.yml` is a repository copy; the project UI flow is the active object and is not automatically loaded from that path in this project. Keep them synchronized deliberately and revalidate after changes. Later flow/MCP configuration must be checked against the schema and permissions enabled on this project. References: [custom flow schema](https://docs.gitlab.com/user/duo_agent_platform/flows/custom_flows_schema/), [flow execution](https://docs.gitlab.com/user/duo_agent_platform/flows/execution/), [triggers](https://docs.gitlab.com/user/duo_agent_platform/triggers/), and [Duo MCP clients](https://docs.gitlab.com/user/gitlab_duo/model_context_protocol/mcp_clients/).
 
-## Path B submission evidence
+## Track A submission evidence
 
-- Original MIT project URL: `https://github.com/annatchijova/to-build-a-fire`.
+- Selected track: **Track A — Start Fresh**. TO BUILD A FIRE was created specifically for this hackathon.
+- Public GitHub mirror: `https://github.com/annatchijova/to-build-a-fire`.
 - Public hackathon GitLab project: `https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase`.
 - Public visibility and MIT license displayed in the GitLab project's About section: pending verification.
-- New work after the October 5 start: commit history for Duo flows/automation, end-to-end GitLab CI, and deployment code. Keep the current local router, documentation, and pre-existing files distinguishable from new integration work.
+- Evidence of the Track A build: repository commit history and hackathon project records. Commits after October 5 show implementation of Duo flows/automation, end-to-end GitLab CI, and deployment code.
 - Public Cloud Run URL: pending Google IAM/OIDC setup and a successful manual deploy; do not submit a placeholder.
 - Live CI/session history and public demonstration video under three minutes: pending.
 - Deployment remains live through the announced winners timeframe; teardown date must be scheduled after November 16, 2026.
