@@ -121,6 +121,8 @@ sequenceDiagram
 
 ## Dirección para el hackathon
 
+TO BUILD A FIRE fue creado específicamente para GitLab Transcend: Life After Code y participa en **Track A — Start Fresh**, con autonomía Assisted. El proyecto Showcase de GitLab es el entorno de integración del hackathon; GitHub se mantiene sincronizado como espejo público.
+
 La evaluación prevista usa cambios sembrados y controles benignos: diffs generados, actualizaciones de dependencias, refactors sólo de formato, tests faltantes, ampliación de autorización en dos líneas, scanners eliminados, assertions debilitadas, umbral de coverage reducido, comandos de CI que terminan en `|| true` y evaluaciones Duo con SHA obsoleto frente al exacto. El inventario está en [`evaluation/corpus.json`](evaluation/corpus.json). Dos jobs de GitLab CI comprueban fixtures del contrato del router determinístico con [`evaluation/run_cases.py`](evaluation/run_cases.py) y del enlace de evaluaciones con [`evaluation/run_link_cases.py`](evaluation/run_link_cases.py). No miden la calidad de detección ni verifican la verdad de la completitud declarada por el mapper. [`test_gitlab_assessment_link.py`](tests/test_gitlab_assessment_link.py) también comprueba que se rechace una evaluación obsoleta y que una del SHA exacto se enlace sin cambiar el paquete determinístico. La evaluación completa busca medir casos críticos enviados a personas, escalaciones benignas innecesarias, minutos humanos frente a una línea base declarada y conclusiones no respaldadas. Todavía no hay métricas del producto.
 
 La demo prevista contrasta un cambio grande, mayormente generado, con un cambio mínimo de autorización y luego muestra la demanda de atención frente a la capacidad del equipo. Debería mostrar cómo la evidencia y los claims protegidos afectan el enrutamiento, sin afirmar que el sistema ya redujo el tiempo de revisión.
@@ -140,7 +142,7 @@ flowchart LR
     MONITOR -. regresión .-> PLAN
 ```
 
-El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evidencia observable. La [matriz Path B / Assisted](docs/hackathon-path-b.md#nine-stage-coverage-contract) define qué prueba necesita cada etapa; todavía no afirma que las integraciones estén ejecutándose.
+El objetivo es que un mismo recorrido de MR atraviese las nueve etapas con evidencia observable. La [matriz Track A / Assisted](docs/hackathon-track-a.md#nine-stage-coverage-contract) define qué prueba necesita cada etapa; todavía no afirma que las integraciones estén ejecutándose.
 
 ## Explorador de Review Packages
 
@@ -160,7 +162,7 @@ Abrí `http://localhost:18765`. También están preparados un contenedor NGINX s
 - `README.es.md` — versión en español de la descripción.
 - `TECHNICAL_README.md` — arquitectura propuesta, límites de decisión, modelo de evidencia y preguntas abiertas.
 - `TODO.md` — destino completo, niveles de construcción, invariantes y criterios de cierre.
-- `docs/hackathon-path-b.md` — contrato Path B/Assisted end to end, evidencia por etapa, permisos requeridos y entregables del hackathon.
+- `docs/hackathon-track-a.md` — contrato Track A / Assisted, evidencia por etapa, permisos requeridos y entregables del hackathon.
 - `.gitlab/duo/flows/attention-review.yml` — configuración versionada del flow de mapeo de MR. El flow activo del proyecto es otro objeto en GitLab; hay que mantenerlo sincronizado antes de depender de su evaluación JSON estructurada.
 - `.gitlab-ci.yml` — SAST de GitLab en pipelines de MR, contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Los hallazgos SAST del SHA exacto se incluyen como evidencia orientativa en Review Package v3; si el informe no está disponible, queda indicado y no cambia la ruta. Ver [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — interfaz local-first para explorar Review Packages y un ejemplo ilustrativo.
@@ -218,4 +220,4 @@ GitLab SAST corrió en la pipeline de MR [#2934776373](https://gitlab.com/gitlab
 
 IAM/WIF de Google ya está configurado para Cloud Run. GitLab devolvió HTTP 403 al proteger el entorno `cloud-run-demo` con el rol actual, por lo que el despliegue y el monitoreo siguen pendientes. El [guion de demo](docs/demo-script.md) usa evidencia verificada y señala Cloud Run como pendiente.
 
-Ver [`docs/hackathon-path-b.md`](docs/hackathon-path-b.md), la [evidencia del snapshot](docs/live-evidence-2026-10-09.md), la [evidencia del enlace v1](docs/live-e2e-assessment-link-2026-10-10.md), la [evidencia del enlace v2](docs/live-e2e-assessment-link-2026-10-11.md) y la [evidencia SAST](docs/live-sast-2026-10-10.md).
+Ver [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), la [evidencia del snapshot](docs/live-evidence-2026-10-09.md), la [evidencia del enlace v1](docs/live-e2e-assessment-link-2026-10-10.md), la [evidencia del enlace v2](docs/live-e2e-assessment-link-2026-10-11.md) y la [evidencia SAST](docs/live-sast-2026-10-10.md).
