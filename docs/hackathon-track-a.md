@@ -92,7 +92,7 @@ The project flow was created in GitLab's UI, enabled, and exercised on MRs !1 an
 - Public GitHub mirror: `https://github.com/annatchijova/to-build-a-fire`.
 - Public hackathon GitLab project: `https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase`.
 - Public visibility and MIT license displayed in the GitLab project's About section: pending verification.
-- New work after the October 5 start: commit history for Duo flows/automation, end-to-end GitLab CI, and deployment code. Keep the current local router, documentation, and pre-existing files distinguishable from new integration work.
+- Evidence of the Track A build: repository commit history and hackathon project records. Commits after October 5 show implementation of Duo flows/automation, end-to-end GitLab CI, and deployment code.
 - Public Cloud Run URL: pending Google IAM/OIDC setup and a successful manual deploy; do not submit a placeholder.
 - Live CI/session history and public demonstration video under three minutes: pending.
 - Deployment remains live through the announced winners timeframe; teardown date must be scheduled after November 16, 2026.
