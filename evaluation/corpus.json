@@ -19,7 +19,7 @@
     {"id": "weakened-assertion", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "reduced-coverage-threshold", "class": "critical-mutation", "expected": "human-attention"},
     {"id": "ci-command-or-true", "class": "critical-mutation", "expected": "human-attention"},
-    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "deep-review-unknown-effort"},
+    {"id": "unmapped-change-surface", "class": "out-of-scope-control", "expected": "DEEP_REVIEW", "fixture": "unmapped-change-surface.json", "oracle": {"kind": "route", "claim_state": "UNCHANGED_BY_DECLARED_SCOPE", "required_attention_reason": "changed_path_outside_declared_claim_scope", "unknown_demand_tasks": 1, "schedule_state": "PARTIAL_UNKNOWN_DEMAND"}},
     {"id": "duo-assessment-stale-head", "class": "stale-evidence-control", "expected": "no-link"},
     {"id": "duo-assessment-exact-head", "class": "exact-revision-control", "expected": "link-preserving-deterministic-package"},
     {"id": "mr-description-prompt-injection", "class": "untrusted-input-attack", "expected": "TARGETED_REVIEW", "fixture": "mr-description-prompt-injection.json", "oracle": {"kind": "route", "claim_state": "UNRESOLVED", "required_reason": "required_check_not_run:authorization-invariants", "candidate_status": "CANDIDATE"}},
