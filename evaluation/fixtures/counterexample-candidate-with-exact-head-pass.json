@@ -1,0 +1,34 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 106,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": ["src/auth.py"]
+  },
+  "observations": [
+    {
+      "id": "falsifier-claim",
+      "kind": "counterexample_candidate",
+      "claim_id": "authorization-boundary",
+      "impact": "not_affected",
+      "source": {"agent": "falsifier", "version": "fixture"},
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "scope": "authorization boundary",
+      "text": "Candidate says the change does not affect the protected authorization claim.",
+      "locations": [{"path": "src/auth.py", "start_line": 1, "end_line": 1}]
+    }
+  ],
+  "checks": [
+    {
+      "id": "authorization-invariants",
+      "claim_id": "authorization-boundary",
+      "status": "PASS",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {"name": "pytest", "version": "fixture"},
+      "scope": "authorization invariants on exact current head",
+      "artifact_ref": "fixture://exact-head-pass"
+    }
+  ]
+}
