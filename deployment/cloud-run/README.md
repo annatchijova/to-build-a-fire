@@ -42,6 +42,8 @@ Protect the GitLab `cloud-run-demo` environment and the default branch before de
 
 The job exchanges a GitLab ID token for short-lived Google credentials, builds from the repository's `Dockerfile` with the dedicated build service account, and deploys the static image as a **private** service. It runs manually from protected `main` after the verify stage passes and records the deployed source SHA, Cloud Run revision, and service URL in a dotenv artifact. It deliberately does not change the service's IAM policy.
 
+After the Cloud Run service URL is anonymously reachable (for example, after the service-level invoker binding below), the protected-main pipeline exposes a separate manual `cloud-run-review-explorer-health` job. It sends an unauthenticated `GET /healthz`, requires HTTP 200 with the exact body `ok`, and writes `artifacts/cloud-run-health.json` with the check time, HTTP status, deployed revision, and source SHA. Run it only after an authorized administrator has enabled anonymous invocation; it does not change IAM or receive Cloud credentials. If access is provided through a gateway instead, this direct-URL check needs to be adapted to that approved endpoint first. The check confirms that Cloud Run reached the NGINX health handler. It does not verify that every static asset loads or independently prove which source was built.
+
 After the first successful deploy, an authorized Google Cloud administrator can make the static demo publicly readable with this one-time service-level binding:
 
 ```sh

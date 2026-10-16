@@ -158,3 +158,25 @@ deploy-cloud-run-review-explorer:
       dotenv: artifacts/cloud-run-deployment.env
     paths:
       - artifacts/cloud-run-deployment.env
+
+# Run only after an operator has made the demo endpoint reachable through its
+# approved access path. This checks the public, non-sensitive health endpoint;
+# it receives no Cloud identity or deployment credentials.
+cloud-run-review-explorer-health:
+  stage: deploy
+  image: python:3.12-slim
+  needs:
+    - job: deploy-cloud-run-review-explorer
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_REF_PROTECTED == "true" && $GCP_PROJECT_ID && $GCP_PROJECT_NUMBER && $GCP_WIF_POOL_ID && $GCP_WIF_PROVIDER_ID && $GCP_DEPLOYER_SERVICE_ACCOUNT && $GCP_RUNTIME_SERVICE_ACCOUNT && $GCP_BUILD_SERVICE_ACCOUNT && $GCP_REGION'
+      when: manual
+      allow_failure: false
+    - when: never
+  script:
+    - python scripts/check_cloud_run_health.py
+  artifacts:
+    when: always
+    expire_in: 1 year
+    paths:
+      - artifacts/cloud-run-health.json
