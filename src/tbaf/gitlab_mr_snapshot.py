@@ -22,6 +22,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from .auth_invariants import MAX_SOURCE_BYTES, build_authorization_check
 from .contract import ContractError, parse_input
+from .generated_artifacts import GENERATED_PATHS, build_generated_artifacts_check
 from .router import build_artifact
 from .sast_evidence import collect_sast_evidence
 
@@ -218,6 +219,13 @@ def create_snapshot(mr_iid: str) -> dict[str, Any]:
         except ContractError:
             auth_source = None
         checks.append(build_authorization_check(auth_source, head_sha))
+    if any(path in changed_paths for path in GENERATED_PATHS):
+        def read_at_head(path: str, maximum: int) -> bytes | None:
+            try:
+                return _git(["show", f"{head_sha}:{path}"], maximum_output=maximum)
+            except ContractError:
+                return None
+        checks.append(build_generated_artifacts_check(read_at_head, head_sha))
 
     sast_evidence = collect_sast_evidence(
         api_root, _required_env("CI_SERVER_URL", maximum=2048), project_id,

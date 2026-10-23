@@ -1,0 +1,8 @@
+{
+  "schema_version": "tbaf.route-matrix-spec/v1",
+  "consequences": ["low", "critical"],
+  "review_routes": ["targeted", "deep"],
+  "check_states": ["PASS", "FAIL", "CONTRADICTED", "NOT_RUN", "UNAVAILABLE", "STALE", "MISSING"],
+  "observations": ["none", "affected", "not_affected", "counterexample", "stale", "unscoped"],
+  "paths": ["protected_only", "protected_and_unmapped", "unmapped_only"]
+}

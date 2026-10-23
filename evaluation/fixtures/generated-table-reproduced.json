@@ -1,0 +1,28 @@
+{
+  "schema_version": "tbaf.review-input/v1",
+  "change": {
+    "project": "example/service",
+    "mr_iid": 107,
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "paths": [
+      "evaluation/generated/route-matrix.json",
+      "evaluation/route-matrix-spec.json"
+    ]
+  },
+  "observations": [],
+  "checks": [
+    {
+      "id": "generated-artifacts-reproducible",
+      "claim_id": "generated-artifacts",
+      "status": "PASS",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": {
+        "name": "tbaf-route-matrix",
+        "version": "1"
+      },
+      "scope": "regenerated table matches committed table on exact head",
+      "artifact_ref": "fixture://generated-table-reproduced"
+    }
+  ]
+}
