@@ -46,7 +46,7 @@ def main() -> int:
         "schema_version": "tbaf.cloud-run-health/v1",
         "status": "failed",
         "checked_at": datetime.now(timezone.utc).isoformat(),
-        "url": f"{base_url.rstrip('/')}/healthz" if base_url else None,
+        "url": f"{base_url.rstrip('/')}/health" if base_url else None,
         "revision": revision or None,
         "source_sha": source_sha or None,
         "http_status": None,
@@ -60,7 +60,7 @@ def main() -> int:
         return 1
 
     request = Request(
-        f"{base_url.rstrip('/')}/healthz",
+        f"{base_url.rstrip('/')}/health",
         headers={"Accept": "text/plain"},
         method="GET",
     )
