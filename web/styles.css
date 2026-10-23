@@ -218,6 +218,7 @@ html[data-theme="light"] .file-button { border-color: #d5cec2; background: #f0ec
 html[data-theme="light"] .steps-list li { border-color: #ded8ce; }
 html[data-theme="light"] .empty-state { border-color: #aaa08e; }
 html[data-theme="light"] .example-notice { background: #fff4d2; color: #573e00; }
+.notice-link { display: inline-block; margin-left: 6px; color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 html[data-theme="light"] .path-item { background: #f4f1eb; color: #39352e; }
 html[data-theme="light"] .reason-item { background: #eee8da; color: #4b3c18; }
 html[data-theme="light"] .package-nav { border-color: #d1c7b7; background: rgba(255, 253, 249, 0.9); }

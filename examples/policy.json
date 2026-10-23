@@ -13,6 +13,16 @@
       "review_route": "targeted",
       "attention_minutes": 35,
       "estimate_source": "Example team estimate; replace with repository policy"
+    },
+    {
+      "id": "generated-artifacts",
+      "statement": "evaluation/generated/route-matrix.json is byte-identical to the default-branch generator output for evaluation/route-matrix-spec.json at the evaluated revision.",
+      "consequence": "low",
+      "path_globs": ["evaluation/route-matrix-spec.json", "evaluation/generated/route-matrix.json"],
+      "required_checks": ["generated-artifacts-reproducible"],
+      "review_route": "targeted",
+      "attention_minutes": 10,
+      "estimate_source": "Example team estimate; replace with repository policy"
     }
   ]
 }
