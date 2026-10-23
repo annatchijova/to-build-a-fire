@@ -65,8 +65,13 @@ def evaluate(corpus_path: Path, policy_path: Path) -> list[dict[str, str]]:
         ]
         if oracle.get("required_reason"):
             checks.append(oracle["required_reason"] in claim["reasons"])
+        if oracle.get("required_attention_reason"):
+            checks.append(oracle["required_attention_reason"] in artifact["attention"]["reasons"])
         if oracle.get("candidate_status"):
             checks.append(all(item["epistemic_status"] == oracle["candidate_status"] for item in parsed["observations"]))
+        for field in ("unknown_demand_tasks", "schedule_state"):
+            if field in oracle:
+                checks.append(artifact["attention"][field] == oracle[field])
         status = "CONTROL_MATCHED" if scenario["class"] == "positive-control" else "ROUTE_MATCHED"
         results.append({"id": scenario["id"], "status": status if all(checks) else "DISCREPANCY"})
 
