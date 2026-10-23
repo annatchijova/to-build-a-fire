@@ -5392,7 +5392,7 @@
         "review_route": "targeted"
       },
       "known_demand_minutes": 30,
-      "route": "TARGETED_REVIEW",
+      "route": "COVERED_BY_EVIDENCE",
       "schedule_state": "WITHIN_CAPACITY",
       "unknown_demand_tasks": 0
     },
