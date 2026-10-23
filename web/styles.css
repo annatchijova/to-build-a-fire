@@ -83,7 +83,7 @@ code { color: #f5d8bd; font-family: ui-monospace, SFMono-Regular, Menlo, Consola
 .button-secondary:hover { transform: translateY(-1px); border-color: var(--ember); }
 .button-primary:disabled, .button-secondary:disabled { cursor: wait; opacity: 0.6; }
 #package-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
-#package-file:focus-visible + .file-button { outline: 3px solid var(--yellow); outline-offset: 3px; }
+#package-file:focus-visible ~ .file-button { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .file-button:focus-within, button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .status { grid-column: 1 / -1; min-height: 1.4em; margin: 8px 0 0; color: var(--muted); font-size: 0.88rem; }
 .status[data-kind="success"] { color: var(--green); }
