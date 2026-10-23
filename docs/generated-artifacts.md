@@ -60,7 +60,9 @@ functions (changed-path listing, check, policy from the base commit, and
 router) against the real Git objects. That local run used no GitLab API and is
 not a CI artifact.
 
-To produce CI evidence, after this change is on the GitLab default branch:
+To produce CI evidence, after this change is on the GitLab default branch
+(merged with a merge commit, not squashed, so the seeded branches still share
+its history):
 
 1. Push both branches to the GitLab project. Open an MR for each against `main`
    and label both as seeded controls. Do not merge them: the snapshot only
