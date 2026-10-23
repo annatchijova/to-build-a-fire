@@ -67,6 +67,8 @@ flowchart LR
 
 La cantidad de líneas ayuda a describir el diff, pero no determina cuánto hay que revisarlo. El sistema debería informar por separado la **superficie cubierta por evidencia** y la **superficie pendiente de revisión**. No debe llamar seguro a un fragmento que no necesita revisión humana sólo porque fue resumido o clasificado como mecánico.
 
+El repositorio lo muestra con su propio archivo generado. `evaluation/generated/route-matrix.json` es una tabla de decisiones del router de unas 10.000 líneas, generada a partir de un spec corto. Un check específico la regenera con el código de la rama por defecto y compara byte a byte. Un diff grande que se reproduce exactamente puede quedar cubierto por evidencia; una sola línea editada a mano hace fallar el check y va a revisión. El check prueba que el archivo es reproducible, no que el cambio del spec sea acertado. Ver [`docs/generated-artifacts.md`](docs/generated-artifacts.md).
+
 ## Qué diferencia a este enfoque
 
 | Cola de revisión típica | TO BUILD A FIRE (propuesto) |

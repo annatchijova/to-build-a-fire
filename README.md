@@ -67,6 +67,8 @@ flowchart LR
 
 Line counts can help describe the diff, but they do not establish how much review it needs. The system should report **evidence-covered surface** and **unresolved review surface** separately. A portion that is not currently flagged for human review must not be described as safe merely because it was summarized or classified as mechanical.
 
+The repository demonstrates this with its own generated file. `evaluation/generated/route-matrix.json` is a router decision table of about 10,000 lines, generated from a short spec. A dedicated check regenerates it with default-branch code and compares bytes. A large diff that reproduces exactly can be covered by evidence; a single hand-edited line fails the check and routes to review. The check proves reproducibility, not that the spec change was wise. See [`docs/generated-artifacts.md`](docs/generated-artifacts.md).
+
 ## What makes the approach different
 
 | Typical review queue | TO BUILD A FIRE (proposed) |
