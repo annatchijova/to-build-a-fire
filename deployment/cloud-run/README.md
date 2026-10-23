@@ -1,6 +1,6 @@
 # Cloud Run deployment
 
-This service is a static Review Package viewer. It serves the page and an illustrative sample; a selected package is read by JavaScript in the browser and is never uploaded. The container has no API, database, or package storage.
+This service is a static Review Package viewer. It serves the page and a recorded MR !2 snapshot rebuilt from public GitLab data; a selected package is read by JavaScript in the browser and is never uploaded. The container has no API, database, or package storage.
 
 ## Local container
 
@@ -56,6 +56,6 @@ gcloud run services add-iam-policy-binding tbaf-review-explorer \
   --role roles/run.invoker
 ```
 
-This grants public invocation of the static page only. The page contains an illustrative package; selected user packages are read in the browser and never sent to the service. If organization policy forbids public Cloud Run invokers, use an approved public access path before claiming a public demo URL.
+This grants public invocation of the static page only. The page contains a recorded package built from a public MR; selected user packages are read in the browser and never sent to the service. If organization policy forbids public Cloud Run invokers, use an approved public access path before claiming a public demo URL.
 
 The configuration follows GitLab's [Google Cloud Workload Identity Federation guide](https://docs.gitlab.com/ci/cloud_services/google_cloud/), Google's [Cloud Run source deployment permissions](https://docs.cloud.google.com/run/docs/deploying-source-code), and the [Cloud Run build service account guidance](https://docs.cloud.google.com/run/docs/configuring/services/build-service-account). IAM roles and current region availability should be checked before deployment.

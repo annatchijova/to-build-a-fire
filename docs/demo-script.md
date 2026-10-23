@@ -4,9 +4,12 @@ Target runtime: **2:35**. Record in English for the hackathon. Use the project's
 own interface and terminal output, no background music, and no unrelated
 company logos or marks. Keep the browser and terminal at readable zoom.
 
-This script uses evidence already recorded for MR !2. Before recording, fetch
-the current artifacts and confirm the SHA and IDs below still match; do not
-present an old artifact as current state.
+This script uses evidence already recorded for MR !2. The original snapshot and
+link artifacts have expired. Before recording, rerun the snapshot for MR !2
+(`glab ci run --branch main --input 'mr_iid:2'`) and confirm the SHA and IDs
+below still match; do not present an old artifact as current state. The
+deployed viewer's recorded snapshot is a fallback for the router view, but it
+is a local rebuild and has no Duo observations.
 
 ## Recording outline
 

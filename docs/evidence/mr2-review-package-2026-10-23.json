@@ -1,0 +1,107 @@
+{
+  "attention": {
+    "capacity_minutes": 90,
+    "known_demand_minutes": 35,
+    "reasons": [
+      "required_check_fail:authorization-invariants"
+    ],
+    "route": "TARGETED_REVIEW",
+    "schedule_state": "WITHIN_CAPACITY",
+    "scheduled_known_minutes": 35,
+    "scheduled_task_ids": [
+      "review:authorization-boundary"
+    ],
+    "tasks": [
+      {
+        "claim_id": "authorization-boundary",
+        "consequence": "critical",
+        "estimate_source": "Example team estimate; replace with repository policy",
+        "locations": [],
+        "reason_codes": [
+          "required_check_fail:authorization-invariants"
+        ],
+        "required_minutes": 35,
+        "route": "TARGETED_REVIEW",
+        "task_id": "review:authorization-boundary"
+      }
+    ],
+    "uncovered_known_minutes": 0,
+    "uncovered_task_ids": [],
+    "unknown_demand_tasks": 0
+  },
+  "change": {
+    "base_sha": "2a9e7f9b82b90d7d6a97bd9f24aa7db878c763f6",
+    "head_sha": "e843e0d8128f5c6363d47e6272850fb709e4badc",
+    "mr_iid": 2,
+    "paths": [
+      "src/auth.py"
+    ],
+    "project": "gitlab-ai-hackathon/transcend-october-2026/1688368/showcase"
+  },
+  "checks": [
+    {
+      "artifact_ref": "git-object:e843e0d8128f5c6363d47e6272850fb709e4badc:src/auth.py",
+      "claim_id": "authorization-boundary",
+      "details": "FAIL: expected authorization behavior violated in authenticated_non_owner_denied (authenticated=true, admin=false, owner=false)",
+      "id": "authorization-invariants",
+      "revision": "e843e0d8128f5c6363d47e6272850fb709e4badc",
+      "scope": "Static AST interpretation of src/auth.py:can_read_record over all eight combinations of authenticated, admin, and owner booleans in the supported expression subset. This does not prove repository-wide imports, runtime reachability, or authorization behavior outside this function.",
+      "source": {
+        "name": "tbaf-static-auth-invariants",
+        "version": "1"
+      },
+      "status": "FAIL"
+    }
+  ],
+  "claims": [
+    {
+      "candidate_observation_ids": [],
+      "claim_id": "authorization-boundary",
+      "consequence": "critical",
+      "evidence_state": "UNRESOLVED",
+      "locations": [],
+      "reasons": [
+        "required_check_fail:authorization-invariants"
+      ],
+      "required_checks": [
+        "authorization-invariants"
+      ]
+    }
+  ],
+  "observations": [],
+  "policy": {
+    "capacity_minutes": 90,
+    "claims": [
+      {
+        "attention_minutes": 35,
+        "consequence": "critical",
+        "estimate_source": "Example team estimate; replace with repository policy",
+        "id": "authorization-boundary",
+        "path_globs": [
+          "src/auth.py"
+        ],
+        "required_checks": [
+          "authorization-invariants"
+        ],
+        "review_route": "targeted",
+        "statement": "can_read_record denies unauthenticated users and authenticated non-owner non-admins, and permits authenticated owners or admins."
+      }
+    ],
+    "id": "service-review",
+    "sha256": "49cc222d887b249ceae3da8083407af4c918182cb0f74cabb3a46e3d635518e4",
+    "version": "1"
+  },
+  "sast_evidence": {
+    "findings": [],
+    "omitted_finding_count": 0,
+    "reason_code": "sast_job_or_artifact_unavailable",
+    "reported_finding_count": 0,
+    "scanner": null,
+    "schema_version": "tbaf.sast-evidence/v1",
+    "source": null,
+    "status": "unavailable",
+    "unchanged_path_finding_count": 0
+  },
+  "schema_version": "tbaf.review-package/v3",
+  "sha256": "a1cf033f892eebe6fc6c459d1626e7d3572e263892e465039ac70509a71531b9"
+}
