@@ -15,10 +15,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
-from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, urlsplit
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -30,13 +33,39 @@ PROJECT_ID = "87290826"
 SERVER_URL = "https://gitlab.com"
 
 
-def _public_mr(api_root: str, project_id: str, mr_iid: str, job_token: str) -> dict:
+def _public_mr(api_root: str, project_id: str, mr_iid: str, _job_token: str) -> dict:
+    parts = urlsplit(api_root)
+    if (
+        parts.scheme != "https"
+        or parts.hostname != "gitlab.com"
+        or parts.port is not None
+        or parts.username is not None
+        or parts.password is not None
+        or parts.path.rstrip("/") != "/api/v4"
+        or parts.query
+        or parts.fragment
+        or project_id != PROJECT_ID
+        or re.fullmatch(r"[1-9][0-9]{0,8}", mr_iid) is None
+    ):
+        raise ContractError("public snapshot requests are restricted to this GitLab project API")
+
     request = Request(
-        f"{api_root}/projects/{project_id}/merge_requests/{mr_iid}",
+        f"{api_root.rstrip('/')}/projects/{quote(project_id, safe='')}/merge_requests/{mr_iid}",
         headers={"Accept": "application/json"},
     )
-    with urlopen(request, timeout=20) as response:
-        value = json.loads(response.read(2_000_001))
+    class RejectRedirects(HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, new_url):
+            return None
+
+    try:
+        opener = build_opener(HTTPSHandler(), RejectRedirects())
+        with opener.open(request, timeout=20) as response:
+            payload = response.read(2_000_001)
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        raise ContractError("GitLab did not return the requested public merge request") from exc
+    if len(payload) > 2_000_000:
+        raise ContractError("GitLab merge-request response exceeds the 2 MB limit")
+    value = json.loads(payload.decode("utf-8", "strict"))
     if not isinstance(value, dict):
         raise ContractError("GitLab merge-request response must be an object")
     return value
