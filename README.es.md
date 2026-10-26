@@ -1,6 +1,6 @@
 # TO BUILD A FIRE
 
-[English](README.md) · [Español](README.es.md) · [README técnico](TECHNICAL_README.md)
+[English](README.md) · [Español](README.es.md) · [README técnico](TECHNICAL_README.md) · [Demo en vivo](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/)
 
 ![TO BUILD A FIRE — La IA abarató el código. La atención humana es escasa.](visual/banner.png)
 
@@ -154,7 +154,7 @@ Para ejecutarla desde la raíz del repositorio:
 python3 -m http.server 18765 --directory web
 ```
 
-Abrí `http://localhost:18765`. También están preparados un contenedor NGINX sin privilegios y un job manual de GitLab con OIDC para Cloud Run, limitado a `main` protegida. IAM/WIF de Google ya está configurado; el primer deploy espera que un Maintainer u Owner proteja el entorno `cloud-run-demo`. La URL y el monitoreo todavía no están activos; ver [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
+Abrí `http://localhost:18765`. El mismo visor también está en vivo en **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, servido desde un contenedor NGINX sin privilegios en Cloud Run a través de un job manual de GitLab con OIDC, limitado a `main` protegida y variables protegidas; IAM/WIF de Google ya está configurado para ese job. Un Maintainer puede proteger además el entorno `cloud-run-demo` para restringir aún más quién puede disparar un despliegue. Ver [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) para despliegue y monitoreo.
 
 ## Mapa del repositorio
 
@@ -166,7 +166,7 @@ Abrí `http://localhost:18765`. También están preparados un contenedor NGINX s
 - `.gitlab/duo/flows/attention-review.yml` — configuración versionada del flow de mapeo de MR. El flow activo del proyecto es otro objeto en GitLab; hay que mantenerlo sincronizado antes de depender de su evaluación JSON estructurada.
 - `.gitlab-ci.yml` — SAST de GitLab en pipelines de MR, contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Los hallazgos SAST del SHA exacto se incluyen como evidencia orientativa en Review Package v3; si el informe no está disponible, queda indicado y no cambia la ruta. Ver [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — interfaz local-first para explorar Review Packages y un ejemplo ilustrativo.
-- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run; IAM/WIF está configurado, mientras que la protección del entorno y el deploy siguen pendientes.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run, desplegado en vivo en [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/); la protección del entorno de GitLab sigue siendo una restricción opcional por ajustar.
 - `scripts/setup-cloud-run-gcp.sh` — preparación desde terminal de IAM/WIF y variables protegidas de CI en GitLab.
 - `docs/adr/` — decisiones de arquitectura y sus supuestos.
 - `.gitignore` — entornos locales de Python, cachés, artefactos de build y secretos.
@@ -218,6 +218,6 @@ Después de aprobación humana, el flow Duo generó una evaluación candidata `t
 
 GitLab SAST corrió en la pipeline de MR [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) y produjo una observación candidata `bandit.B101` informativa. Review Package v3 ahora incluye datos acotados de informes SAST exitosos asociados al SHA exacto del MR. Los hallazgos siguen siendo orientativos y no alteran la ruta; ver [`docs/sast-review-package.md`](docs/sast-review-package.md).
 
-IAM/WIF de Google ya está configurado para Cloud Run. GitLab devolvió HTTP 403 al proteger el entorno `cloud-run-demo` con el rol actual, por lo que el despliegue y el monitoreo siguen pendientes. El [guion de demo](docs/demo-script.md) usa evidencia verificada y señala Cloud Run como pendiente.
+IAM/WIF de Google ya está configurado para el job de despliegue en Cloud Run, y el servicio está en vivo en [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/). GitLab sigue devolviendo HTTP 403 al proteger el entorno `cloud-run-demo` con el rol actual, así que esa restricción extra y el job de chequeo de salud en CI todavía quedan por ejercitar. El [guion de demo](docs/demo-script.md) es anterior a este despliegue y todavía señala Cloud Run como pendiente; actualizarlo antes de grabar.
 
 Ver [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), la [evidencia del snapshot](docs/live-evidence-2026-10-09.md), la [evidencia del enlace v1](docs/live-e2e-assessment-link-2026-10-10.md), la [evidencia del enlace v2](docs/live-e2e-assessment-link-2026-10-11.md) y la [evidencia SAST](docs/live-sast-2026-10-10.md).

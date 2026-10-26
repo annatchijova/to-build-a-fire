@@ -1,6 +1,6 @@
 # TO BUILD A FIRE
 
-[English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
+[English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md) · [Live demo](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/)
 
 ![TO BUILD A FIRE — AI made code cheap. Human attention is scarce.](visual/banner.png)
 
@@ -156,7 +156,7 @@ Run it locally from the repository root:
 python3 -m http.server 18765 --directory web
 ```
 
-Open `http://localhost:18765`. A non-root NGINX container and a protected, manual GitLab OIDC deploy job for Cloud Run are also prepared. Google IAM/WIF is configured; first deployment is waiting for a Maintainer or Owner to protect the `cloud-run-demo` environment. The hosted URL and monitoring are not live yet; see [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
+Open `http://localhost:18765`. The same viewer is also live at **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, served from a non-root NGINX container on Cloud Run through a protected, manual GitLab OIDC deploy job; Google IAM/WIF is configured for that job. A Maintainer can optionally protect the `cloud-run-demo` GitLab environment to further restrict who can trigger a deploy. See [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) for deployment and monitoring details.
 
 ## Repository map
 
@@ -168,7 +168,7 @@ Open `http://localhost:18765`. A non-root NGINX container and a protected, manua
 - `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Exact-head SAST findings are included as advisory evidence in Review Package v3; missing or inaccessible reports remain visibly unavailable and do not change routing. See [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — local-first Review Package Explorer and illustrative sample.
-- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration; Google IAM/WIF is configured, while environment protection and deployment remain pending.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration, deployed live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/); environment protection for the GitLab deploy job is still optional to tighten further.
 - `scripts/setup-cloud-run-gcp.sh` — terminal setup for project-scoped Google IAM/WIF and protected GitLab CI variables.
 - `docs/adr/` — architecture decisions and their assumptions.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
@@ -220,6 +220,6 @@ The Duo MR flow produced a `tbaf.duo-assessment/v2` candidate assessment after h
 
 GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) and produced one informational `bandit.B101` candidate. Review Package v3 now includes bounded SAST data from successful reports tied to the exact MR head. Scanner findings remain advisory and outside the routing decision; see [`docs/sast-review-package.md`](docs/sast-review-package.md).
 
-Google IAM/WIF is configured for Cloud Run. Protecting the `cloud-run-demo` GitLab environment returned HTTP 403 for the current role, so deployment and monitoring remain unfinished. The [demo script](docs/demo-script.md) uses verified evidence and marks Cloud Run as pending.
+Google IAM/WIF is configured for the Cloud Run deploy job, and the service is live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/). Protecting the `cloud-run-demo` GitLab environment still returns HTTP 403 for the current role, so that extra restriction and the CI health-check job remain to be exercised. The [demo script](docs/demo-script.md) predates this deployment and still marks Cloud Run as pending; update it before recording.
 
 See [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).
