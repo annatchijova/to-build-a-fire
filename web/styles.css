@@ -54,6 +54,10 @@ button, input { font: inherit; }
 .header-select { min-height: 36px; padding: 0 28px 0 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-raised); color: var(--text); }
 .header-select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.hero-banner { margin-top: 24px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.hero-banner img { display: block; width: 100%; height: auto; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.hero-links .button-secondary { text-decoration: none; }
 .intro { padding: clamp(42px, 7vw, 82px) 0 30px; }
 .eyebrow { margin: 0 0 10px; color: var(--ember); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; }
 h1, h2, h3, p { margin-top: 0; }
