@@ -1,6 +1,6 @@
 # TO BUILD A FIRE
 
-[English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md)
+[English](README.md) · [Español](README.es.md) · [Technical README](TECHNICAL_README.md) · [Live demo](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/)
 
 ![TO BUILD A FIRE — AI made code cheap. Human attention is scarce.](visual/banner.png)
 
@@ -158,7 +158,7 @@ Run it locally from the repository root:
 python3 -m http.server 18765 --directory web
 ```
 
-Open `http://localhost:18765`. The same page runs on Cloud Run from a non-root NGINX container, deployed by a protected, manual GitLab OIDC job. The first revision is deployed; its health check is pending a redeploy, and runtime monitoring is not built yet. See [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
+Open `http://localhost:18765`. The same viewer is also live at **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, served from a non-root NGINX container on Cloud Run through a protected, manual GitLab OIDC deploy job; Google IAM/WIF is configured for that job. Its `/health` endpoint responds, and runtime monitoring is not built yet. See [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) for deployment and monitoring details.
 
 ## Repository map
 
@@ -170,7 +170,7 @@ Open `http://localhost:18765`. The same page runs on Cloud Run from a non-root N
 - `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Exact-head SAST findings are included as advisory evidence in Review Package v3; missing or inaccessible reports remain visibly unavailable and do not change routing. See [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — local-first Review Package Explorer and the recorded MR !2 snapshot.
-- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration; the first revision is deployed and its health check is pending.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration, deployed live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/) with a passing `/health` check; environment protection for the GitLab deploy job is still optional to tighten further.
 - `scripts/setup-cloud-run-gcp.sh` — terminal setup for project-scoped Google IAM/WIF and protected GitLab CI variables.
 - `scripts/reproduce_public_mr_snapshot.py` — rebuilds an MR Review Package outside CI from public GitLab data.
 - `docs/evidence/` — recorded artifacts that outlive CI artifact retention.
@@ -224,8 +224,8 @@ The Duo MR flow produced a `tbaf.duo-assessment/v2` candidate assessment after h
 
 GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) and produced one informational `bandit.B101` candidate. Review Package v3 now includes bounded SAST data from successful reports tied to the exact MR head. Scanner findings remain advisory and outside the routing decision; see [`docs/sast-review-package.md`](docs/sast-review-package.md).
 
-The snapshot and link artifacts from those pipelines expired after one week. The MR !2 package was rebuilt from public data with the same snapshot code and is kept in [`docs/evidence/`](docs/evidence/). It matches the recorded route, check result and claim state, but it is not a CI artifact and carries no Duo observations. These jobs now keep artifacts for one year.
+Google IAM/WIF is configured for the Cloud Run deploy job. The snapshot and link artifacts from those pipelines expired after one week; the MR !2 package was rebuilt from public data with the same snapshot code and is kept in [`docs/evidence/`](docs/evidence/). It matches the recorded route, check result, and claim state, but it is not a CI artifact and carries no Duo observations. These jobs now keep artifacts for one year.
 
-The first Cloud Run revision, `tbaf-review-explorer-00001-6cs`, was deployed from `5ac8c93` in pipeline [#2979674219](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2979674219). Its health check returned HTTP 404 because Cloud Run reserves `/healthz`. The endpoint moved to `/health` in MR !29, which is waiting to be redeployed. Health is unverified and runtime monitoring is not built. The [demo script](docs/demo-script.md) marks Cloud Run as pending until the health check passes.
+The first Cloud Run revision, `tbaf-review-explorer-00001-6cs`, was deployed from `5ac8c93` in pipeline [#2979674219](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2979674219). Its health check returned HTTP 404 because Cloud Run reserves `/healthz`. The endpoint moved to `/health` in MR !29; revision `tbaf-review-explorer-00003-7hq` redeployed with that fix, and `/health` now returns `200 ok` at the live URL above. Protecting the `cloud-run-demo` GitLab environment still returns HTTP 403 for the current role, and runtime monitoring beyond the health check is not built yet. The [demo script](docs/demo-script.md) predates this deployment and still marks Cloud Run as pending; update it before recording.
 
 See [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), the [SAST evidence](docs/live-sast-2026-10-10.md), and the [reproduced and deployment evidence](docs/reproduced-evidence-2026-10-23.md).

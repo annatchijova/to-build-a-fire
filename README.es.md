@@ -1,6 +1,6 @@
 # TO BUILD A FIRE
 
-[English](README.md) · [Español](README.es.md) · [README técnico](TECHNICAL_README.md)
+[English](README.md) · [Español](README.es.md) · [README técnico](TECHNICAL_README.md) · [Demo en vivo](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/)
 
 ![TO BUILD A FIRE — La IA abarató el código. La atención humana es escasa.](visual/banner.png)
 
@@ -156,7 +156,7 @@ Para ejecutarla desde la raíz del repositorio:
 python3 -m http.server 18765 --directory web
 ```
 
-Abrí `http://localhost:18765`. La misma página corre en Cloud Run desde un contenedor NGINX sin privilegios, desplegada por un job manual de GitLab con OIDC limitado a `main` protegida. La primera revisión ya está desplegada; su health check espera un nuevo deploy y el monitoreo en ejecución todavía no existe. Ver [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md).
+Abrí `http://localhost:18765`. El mismo visor también está en vivo en **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, servido desde un contenedor NGINX sin privilegios en Cloud Run a través de un job manual de GitLab con OIDC, limitado a `main` protegida y variables protegidas; IAM/WIF de Google ya está configurado para ese job. Su endpoint `/health` responde correctamente, y el monitoreo en ejecución todavía no existe. Ver [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) para despliegue y monitoreo.
 
 ## Mapa del repositorio
 
@@ -168,7 +168,7 @@ Abrí `http://localhost:18765`. La misma página corre en Cloud Run desde un con
 - `.gitlab/duo/flows/attention-review.yml` — configuración versionada del flow de mapeo de MR. El flow activo del proyecto es otro objeto en GitLab; hay que mantenerlo sincronizado antes de depender de su evaluación JSON estructurada.
 - `.gitlab-ci.yml` — SAST de GitLab en pipelines de MR, contrato, router de ejemplo, captura de MR en `main` y enlace condicional de evaluaciones Duo. Los hallazgos SAST del SHA exacto se incluyen como evidencia orientativa en Review Package v3; si el informe no está disponible, queda indicado y no cambia la ruta. Ver [`docs/sast-review-package.md`](docs/sast-review-package.md).
 - `web/` — interfaz local-first para explorar Review Packages y el snapshot registrado del MR !2.
-- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run; la primera revisión está desplegada y su health check sigue pendiente.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — contenedor estático y configuración de despliegue en Cloud Run, desplegado en vivo en [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/) con el health check en verde; la protección del entorno de GitLab sigue siendo una restricción opcional por ajustar.
 - `scripts/setup-cloud-run-gcp.sh` — preparación desde terminal de IAM/WIF y variables protegidas de CI en GitLab.
 - `scripts/reproduce_public_mr_snapshot.py` — reconstruye fuera de CI el Review Package de un MR a partir de datos públicos de GitLab.
 - `docs/evidence/` — artefactos registrados que sobreviven a la retención de artefactos de CI.
@@ -222,8 +222,8 @@ Después de aprobación humana, el flow Duo generó una evaluación candidata `t
 
 GitLab SAST corrió en la pipeline de MR [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) y produjo una observación candidata `bandit.B101` informativa. Review Package v3 ahora incluye datos acotados de informes SAST exitosos asociados al SHA exacto del MR. Los hallazgos siguen siendo orientativos y no alteran la ruta; ver [`docs/sast-review-package.md`](docs/sast-review-package.md).
 
-Los artefactos de snapshot y enlace de esas pipelines vencieron a la semana. El paquete del MR !2 se reconstruyó desde datos públicos con el mismo código del snapshot y quedó en [`docs/evidence/`](docs/evidence/). Coincide con la ruta, el resultado del check y el estado del claim registrados, pero no es un artefacto de CI y no incluye observaciones de Duo. Ahora esos jobs conservan los artefactos durante un año.
+IAM/WIF de Google ya está configurado para el job de despliegue en Cloud Run. Los artefactos de snapshot y enlace de esas pipelines vencieron a la semana; el paquete del MR !2 se reconstruyó desde datos públicos con el mismo código del snapshot y quedó en [`docs/evidence/`](docs/evidence/). Coincide con la ruta, el resultado del check y el estado del claim registrados, pero no es un artefacto de CI y no incluye observaciones de Duo. Ahora esos jobs conservan los artefactos durante un año.
 
-La primera revisión de Cloud Run, `tbaf-review-explorer-00001-6cs`, se desplegó desde `5ac8c93` en la pipeline [#2979674219](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2979674219). Su health check devolvió HTTP 404 porque Cloud Run reserva `/healthz`. El MR !29 movió el endpoint a `/health` y espera un nuevo deploy. La salud del servicio no está verificada y el monitoreo en ejecución no existe todavía. El [guion de demo](docs/demo-script.md) marca Cloud Run como pendiente hasta que pase el health check.
+La primera revisión de Cloud Run, `tbaf-review-explorer-00001-6cs`, se desplegó desde `5ac8c93` en la pipeline [#2979674219](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2979674219). Su health check devolvió HTTP 404 porque Cloud Run reserva `/healthz`. El MR !29 movió el endpoint a `/health`; la revisión `tbaf-review-explorer-00003-7hq` redesplegó con esa corrección, y `/health` ahora devuelve `200 ok` en la URL en vivo de arriba. GitLab sigue devolviendo HTTP 403 al proteger el entorno `cloud-run-demo` con el rol actual, y el monitoreo en ejecución más allá del health check todavía no existe. El [guion de demo](docs/demo-script.md) es anterior a este despliegue y todavía señala Cloud Run como pendiente; actualizarlo antes de grabar.
 
 Ver [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), la [evidencia del snapshot](docs/live-evidence-2026-10-09.md), la [evidencia del enlace v1](docs/live-e2e-assessment-link-2026-10-10.md), la [evidencia del enlace v2](docs/live-e2e-assessment-link-2026-10-11.md) la [evidencia SAST](docs/live-sast-2026-10-10.md) y la [evidencia reproducida y de despliegue](docs/reproduced-evidence-2026-10-23.md).
