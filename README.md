@@ -67,6 +67,8 @@ flowchart LR
 
 Line counts can help describe the diff, but they do not establish how much review it needs. The system should report **evidence-covered surface** and **unresolved review surface** separately. A portion that is not currently flagged for human review must not be described as safe merely because it was summarized or classified as mechanical.
 
+The repository demonstrates this with its own generated file. `evaluation/generated/route-matrix.json` is a router decision table of about 10,000 lines, generated from a short spec. A dedicated check regenerates it with default-branch code and compares bytes. A large diff that reproduces exactly can be covered by evidence; a single hand-edited line fails the check and routes to review. The check proves reproducibility, not that the spec change was wise. See [`docs/generated-artifacts.md`](docs/generated-artifacts.md).
+
 ## What makes the approach different
 
 | Typical review queue | TO BUILD A FIRE (proposed) |
@@ -148,7 +150,7 @@ These stages describe the intended direction, not completed integrations. GitLab
 
 ## Review Package Explorer
 
-The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. It also accepts a linked v2 envelope to show Duo's candidate notes and reported diff coverage beside the deterministic route. Coverage remains explicitly unverified and cannot change that route. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled example is illustrative, and its displayed SHA-256 digest is not verified by the viewer. The interface offers English and Spanish plus light and dark themes, and remembers each choice on the device. Agent-written evidence stays in its original language.
+The browser-only viewer displays a Review Package's attention route, unresolved claims, checks, human tasks, and candidate observations. It also accepts a linked v2 envelope to show Duo's candidate notes and reported diff coverage beside the deterministic route. Coverage remains explicitly unverified and cannot change that route. Select a CI artifact from your device; JavaScript reads it locally and never uploads it. The bundled sample is the MR !2 snapshot, rebuilt from public GitLab data with the CI snapshot code (see [`docs/reproduced-evidence-2026-10-23.md`](docs/reproduced-evidence-2026-10-23.md)). The viewer displays its SHA-256 digest but does not verify it. The interface offers English and Spanish plus light and dark themes, and remembers each choice on the device. Agent-written evidence stays in its original language.
 
 Run it locally from the repository root:
 
@@ -156,7 +158,7 @@ Run it locally from the repository root:
 python3 -m http.server 18765 --directory web
 ```
 
-Open `http://localhost:18765`. The same viewer is also live at **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, served from a non-root NGINX container on Cloud Run through a protected, manual GitLab OIDC deploy job; Google IAM/WIF is configured for that job. A Maintainer can optionally protect the `cloud-run-demo` GitLab environment to further restrict who can trigger a deploy. See [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) for deployment and monitoring details.
+Open `http://localhost:18765`. The same viewer is also live at **https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/**, served from a non-root NGINX container on Cloud Run through a protected, manual GitLab OIDC deploy job; Google IAM/WIF is configured for that job. Its `/health` endpoint responds, and runtime monitoring is not built yet. See [`deployment/cloud-run/README.md`](deployment/cloud-run/README.md) for deployment and monitoring details.
 
 ## Repository map
 
@@ -167,9 +169,11 @@ Open `http://localhost:18765`. The same viewer is also live at **https://tbaf-re
 - `docs/hackathon-track-a.md` — Track A / Assisted lifecycle contract, integration evidence, access dependencies, and submission proof.
 - `.gitlab/duo/flows/attention-review.yml` — checked-in MR-mapping flow configuration. The live project flow is a separate UI object; keep it synchronized with this file before relying on its structured assessment output.
 - `.gitlab-ci.yml` — GitLab SAST on MR pipelines, contract, example-router, default-branch MR snapshot, and conditional Duo-assessment linking jobs. Exact-head SAST findings are included as advisory evidence in Review Package v3; missing or inaccessible reports remain visibly unavailable and do not change routing. See [`docs/sast-review-package.md`](docs/sast-review-package.md).
-- `web/` — local-first Review Package Explorer and illustrative sample.
-- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration, deployed live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/); environment protection for the GitLab deploy job is still optional to tighten further.
+- `web/` — local-first Review Package Explorer and the recorded MR !2 snapshot.
+- `Dockerfile`, `deployment/cloud-run/`, `.gcloudignore` — static Cloud Run container and deployment configuration, deployed live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/) with a passing `/health` check; environment protection for the GitLab deploy job is still optional to tighten further.
 - `scripts/setup-cloud-run-gcp.sh` — terminal setup for project-scoped Google IAM/WIF and protected GitLab CI variables.
+- `scripts/reproduce_public_mr_snapshot.py` — rebuilds an MR Review Package outside CI from public GitLab data.
+- `docs/evidence/` — recorded artifacts that outlive CI artifact retention.
 - `docs/adr/` — architecture decisions and their assumptions.
 - `.gitignore` — local Python environments, caches, build output, and secrets.
 - `visual/` — project banner and future visual assets.
@@ -220,6 +224,8 @@ The Duo MR flow produced a `tbaf.duo-assessment/v2` candidate assessment after h
 
 GitLab SAST ran in MR pipeline [#2934776373](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2934776373) and produced one informational `bandit.B101` candidate. Review Package v3 now includes bounded SAST data from successful reports tied to the exact MR head. Scanner findings remain advisory and outside the routing decision; see [`docs/sast-review-package.md`](docs/sast-review-package.md).
 
-Google IAM/WIF is configured for the Cloud Run deploy job, and the service is live at [tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app](https://tbaf-review-explorer-zxmd2hmaaa-uc.a.run.app/). Protecting the `cloud-run-demo` GitLab environment still returns HTTP 403 for the current role, so that extra restriction and the CI health-check job remain to be exercised. The [demo script](docs/demo-script.md) predates this deployment and still marks Cloud Run as pending; update it before recording.
+Google IAM/WIF is configured for the Cloud Run deploy job. The snapshot and link artifacts from those pipelines expired after one week; the MR !2 package was rebuilt from public data with the same snapshot code and is kept in [`docs/evidence/`](docs/evidence/). It matches the recorded route, check result, and claim state, but it is not a CI artifact and carries no Duo observations. These jobs now keep artifacts for one year.
 
-See [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), and the [SAST evidence](docs/live-sast-2026-10-10.md).
+The first Cloud Run revision, `tbaf-review-explorer-00001-6cs`, was deployed from `5ac8c93` in pipeline [#2979674219](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/1688368/showcase/-/pipelines/2979674219). Its health check returned HTTP 404 because Cloud Run reserves `/healthz`. The endpoint moved to `/health` in MR !29; revision `tbaf-review-explorer-00003-7hq` redeployed with that fix, and `/health` now returns `200 ok` at the live URL above. Protecting the `cloud-run-demo` GitLab environment still returns HTTP 403 for the current role, and runtime monitoring beyond the health check is not built yet. The [demo script](docs/demo-script.md) predates this deployment and still marks Cloud Run as pending; update it before recording.
+
+See [`docs/hackathon-track-a.md`](docs/hackathon-track-a.md), the [snapshot evidence](docs/live-evidence-2026-10-09.md), the [v1 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-10.md), the [v2 assessment-link evidence](docs/live-e2e-assessment-link-2026-10-11.md), the [SAST evidence](docs/live-sast-2026-10-10.md), and the [reproduced and deployment evidence](docs/reproduced-evidence-2026-10-23.md).

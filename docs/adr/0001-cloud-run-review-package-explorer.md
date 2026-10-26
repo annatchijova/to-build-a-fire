@@ -14,7 +14,7 @@ Reversibility: two-way door; replace the static container or hosting target with
 
 ## Decision
 
-Build a static Review Package Explorer and serve it from a non-root NGINX container on Cloud Run. The page loads the bundled illustrative package or reads a user-selected JSON file in the browser. It does not upload, persist, or transmit the selected package. The public page labels the bundled data as illustrative and the package digest as unverified identity metadata.
+Build a static Review Package Explorer and serve it from a non-root NGINX container on Cloud Run. The page loads the bundled package or reads a user-selected JSON file in the browser. It does not upload, persist, or transmit the selected package. The public page labels the bundled data as illustrative and the package digest as unverified identity metadata. Update (2026-10-23): the bundled package is now the MR !2 snapshot rebuilt from public data, labeled as a recorded local rebuild rather than a live MR.
 
 The initial deployment uses the configured project and region, scales to zero, and caps the service at one instance. GitLab deploys only from protected `main` through a manual job authenticated with OIDC. No package-processing API, database, or user content storage is part of this decision.
 

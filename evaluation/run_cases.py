@@ -57,7 +57,7 @@ def evaluate(corpus_path: Path, policy_path: Path) -> list[dict[str, str]]:
             continue
 
         artifact = build_artifact(parsed)
-        claim_id = parsed["policy"]["claims"][0]["id"]
+        claim_id = oracle.get("claim_id", parsed["policy"]["claims"][0]["id"])
         claim = next(item for item in artifact["claims"] if item["claim_id"] == claim_id)
         checks = [
             artifact["attention"]["route"] == scenario["expected"],
